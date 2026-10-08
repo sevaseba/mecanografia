@@ -10,6 +10,10 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 - **Distribuciones de teclado:** Español Latinoamericano (ñ, tildes, diéresis, ¿ ¡) e Inglés (US). Se elige por perfil y se puede cambiar en cualquier momento.
   - Toda la lógica de teclado (mapa físico de teclas, caracteres por capa, dedo asignado, teclas muertas y sus composiciones) vive en archivos de datos: `js/layouts/es-latam.js` y `js/layouts/en-us.js`.
   - Ningún otro módulo puede tener conocimiento hardcodeado de una distribución. Agregar una distribución nueva = sumar un archivo en `js/layouts/` y registrarlo en `js/layouts/index.js`.
+- **Cursos por distribución:** las lecciones se organizan en `lessons/<layout-id>/` (`lessons/es-latam/`, `lessons/en-us/`), cada carpeta con su `index.json` que lista las lecciones en orden. Cada perfil ve solo el curso de su distribución; si cambia de distribución, pasa a ver el otro curso (el progreso se guarda por distribución).
+- **Fila guía y orden de introducción de teclas:**
+  - Español Latinoamericano: el nivel 1 es la fila guía completa **a s d f j k l ñ** (la ñ es una tecla más de la fila guía, no un caso especial). Tildes, diéresis y los signos ¿ ¡ se introducen en niveles posteriores.
+  - Inglés (US): el nivel 1 es **a s d f j k l ;**.
 - **Perfiles:** guardados en `localStorage`. Cada perfil tiene nombre, distribución, modo (`kids` = infantil: lúdico, teclado grande, premios / `adult` = adulto: sobrio, foco en PPM y precisión) y su progreso.
 - **Offline:** todo funciona sin conexión una vez instalada, vía service worker (`sw.js` en la raíz) con precache de todos los archivos de la app.
 - **Accesibilidad:** navegable 100 % por teclado, foco visible, contraste mínimo WCAG AA (4.5:1 texto normal), fuentes generosas (base ≥ 18 px adulto, ≥ 24 px infantil), respetar `prefers-reduced-motion`, regiones `aria-live` para feedback.
@@ -23,7 +27,12 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 ├── sw.js                 # service worker (debe estar en la raíz por el scope)
 ├── css/                  # estilos: base, temas (infantil/adulto), componentes
 ├── js/
-│   ├── app.js            # punto de entrada, router de pantallas
+│   ├── app.js            # punto de entrada: arranque y registro del service worker
+│   ├── router.js         # navegación por hash (#/...) y montaje de pantallas
+│   ├── strings.js        # todos los textos de la interfaz
+│   ├── dom.js            # helper el() para crear nodos sin innerHTML
+│   ├── announcer.js      # anuncios para lectores de pantalla (aria-live)
+│   ├── screens/          # una pantalla por módulo (exporta render(container))
 │   ├── storage.js        # acceso a localStorage (perfiles y progreso)
 │   ├── profiles.js       # alta/baja/edición de perfiles
 │   ├── input.js          # captura de teclado, teclas muertas, composición
@@ -35,7 +44,13 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │       ├── index.js      # registro de distribuciones disponibles
 │       ├── es-latam.js
 │       └── en-us.js
-├── lessons/              # lecciones en JSON, por distribución
+├── lessons/              # un curso por distribución
+│   ├── es-latam/
+│   │   ├── index.json    # orden de lecciones del curso
+│   │   └── 01-fila-guia.json, ...
+│   └── en-us/
+│       ├── index.json
+│       └── 01-home-row.json, ...
 ├── icons/                # íconos de la PWA (192, 512, maskable)
 └── assets/               # sonidos, ilustraciones, fuentes
 ```

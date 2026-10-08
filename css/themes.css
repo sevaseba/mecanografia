@@ -1,0 +1,69 @@
+/* Themes. The active profile mode is set on <html data-mode="adult|kids">. */
+
+:root,
+[data-mode="adult"] {
+  --font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-size-base: 18px;
+  --font-size-h1: 2rem;
+  --radius: 8px;
+  --focus-width: 3px;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+
+  --color-bg: #f7f7f5;
+  --color-surface: #ffffff;
+  --color-border: #d9d9d6;
+  --color-text: #1c1c1e;
+  --color-text-muted: #55555a;
+  --color-heading: #0f3a6b;
+  --color-link: #1d5fa8;
+  --color-accent: #1d5fa8;
+  --color-accent-hover: #174c87;
+  --color-on-accent: #ffffff;
+  --color-focus: #c2410c;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  [data-mode="adult"] {
+    --color-bg: #16181d;
+    --color-surface: #1f232b;
+    --color-border: #343a46;
+    --color-text: #ececf0;
+    --color-text-muted: #a8adb7;
+    --color-heading: #9cc4ff;
+    --color-link: #8bb8ff;
+    --color-accent: #8bb8ff;
+    --color-accent-hover: #b0cfff;
+    --color-on-accent: #0b1a2e;
+    --color-focus: #ffb070;
+
+    color-scheme: dark;
+  }
+}
+
+/* Kids mode: always light, bigger type, rounder shapes, playful colors. */
+[data-mode="kids"] {
+  --font-family: ui-rounded, "Arial Rounded MT Bold", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-size-base: 24px;
+  --font-size-h1: 2.2rem;
+  --radius: 20px;
+  --focus-width: 4px;
+
+  --color-bg: #fff6e0;
+  --color-surface: #ffffff;
+  --color-border: #f2d48a;
+  --color-text: #2b2340;
+  --color-text-muted: #5b4f6e;
+  --color-heading: #6d28d9;
+  --color-link: #6d28d9;
+  --color-accent: #6d28d9;
+  --color-accent-hover: #5b21b6;
+  --color-on-accent: #ffffff;
+  --color-focus: #db2777;
+
+  color-scheme: light;
+}
