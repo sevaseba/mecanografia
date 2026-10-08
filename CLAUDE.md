@@ -28,13 +28,15 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 ├── css/                  # base.css, themes.css (tokens por modo) y un archivo por componente
 ├── js/
 │   ├── app.js            # punto de entrada: arranque y registro del service worker
-│   ├── router.js         # navegación por hash (#/...) y montaje de pantallas
+│   ├── router.js         # navegación por hash (#/...), rutas con parámetros, redirecciones
 │   ├── strings.js        # todos los textos de la interfaz
 │   ├── dom.js            # helper el() para crear nodos sin innerHTML
 │   ├── announcer.js      # anuncios para lectores de pantalla (aria-live)
 │   ├── screens/          # una pantalla por módulo (exporta render(container))
-│   ├── storage.js        # acceso a localStorage (perfiles y progreso)
-│   ├── profiles.js       # alta/baja/edición de perfiles
+│   ├── storage.js        # documento versionado en localStorage, migraciones, respaldo JSON
+│   ├── profiles.js       # alta/baja/edición de perfiles, perfil activo, progreso por distribución
+│   ├── dialog.js         # confirmación accesible con <dialog>
+│   ├── calibration-view.js # prueba opcional de teclado (tecla a la derecha de la L, etc.)
 │   ├── input.js          # captura de teclado, teclas muertas, composición
 │   ├── keystrokes.js     # carácter ↔ secuencia de teclas físicas según la distribución
 │   ├── layout-check.js   # detección de distribución del SO vs. la elegida
@@ -56,9 +58,18 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │   └── en-us/
 │       ├── index.json
 │       └── 01-home-row.json, ...
+├── tests/                # pruebas de la lógica pura: `node --test` desde la raíz
 ├── icons/                # íconos de la PWA (192, 512, maskable)
 └── assets/               # sonidos, ilustraciones, fuentes
 ```
+
+## Datos y perfiles
+
+- Todo se guarda en **una** clave de localStorage, `mecanografia`, como documento JSON con `version` (esquema documentado al principio de `js/storage.js`). Para cambiar la forma: subir `SCHEMA_VERSION` y agregar `MIGRATIONS[versiónVieja]`; nunca leer ni escribir localStorage fuera de `storage.js`.
+- El progreso va en `profile.progress[layoutId]`: un curso por distribución dentro del mismo perfil.
+- Respaldo: `{ app: "mecanografia", type: "backup", exportedAt, data }`. Importar valida, migra y reemplaza todo previa confirmación.
+- Pantallas: `#/` elegir perfil (y respaldo; mostrarla deja sin perfil activo), `#/perfiles/nuevo`, `#/perfiles/:id/editar`, `#/inicio` del perfil activo. Las pantallas que necesitan un perfil activo redirigen a `#/`.
+- El modo (`data-mode` en `<html>`) y la distribución de la práctica salen del perfil activo.
 
 ## Pantalla de práctica
 
@@ -83,6 +94,8 @@ Teclado libre y lecciones usan `practice-view.js`. Reglas de diseño:
 - Cuando se agrega o renombra un archivo de la app, actualizar la lista de precache en `sw.js` y subir su versión de caché.
 
 ## Regla de verificación
+
+La lógica pura (sesión, almacenamiento, perfiles, detección de distribución) tiene pruebas en `tests/`, que se corren con `node --test` desde la raíz (Node viene con su propio runner, sin dependencias). Correrlas antes de cada commit.
 
 Ninguna tarea se da por terminada sin abrir `index.html` **servido localmente** (no con `file://`, porque los ES modules y el service worker no funcionan así) y comprobar el cambio en el navegador, revisando también la consola sin errores. Por ejemplo:
 

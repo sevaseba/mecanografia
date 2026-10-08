@@ -1,16 +1,30 @@
-// Entry point: mounts the router and registers the service worker.
+// Entry point: applies the active profile's mode, mounts the router and registers the
+// service worker.
 
 import { startRouter } from './router.js';
 import { announce } from './announcer.js';
 import { strings } from './strings.js';
+import { profiles } from './profiles.js';
+import * as profilePickerScreen from './screens/profile-picker.js';
+import * as profileFormScreen from './screens/profile-form.js';
 import * as homeScreen from './screens/home.js';
 import * as freeTypingScreen from './screens/free-typing.js';
 import * as notFoundScreen from './screens/not-found.js';
 
 const routes = {
-  '/': homeScreen,
+  '/': profilePickerScreen,
+  '/perfiles/nuevo': profileFormScreen,
+  '/perfiles/:id/editar': profileFormScreen,
+  '/inicio': homeScreen,
   '/teclado-libre': freeTypingScreen,
 };
+
+// The whole UI (theme, sizes, what is shown) follows the active profile's mode.
+const applyActiveMode = () => {
+  document.documentElement.dataset.mode = profiles.active()?.mode ?? 'adult';
+};
+profiles.onChange(applyActiveMode);
+applyActiveMode();
 
 startRouter(document.getElementById('app'), routes, notFoundScreen);
 registerServiceWorker();

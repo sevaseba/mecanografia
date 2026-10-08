@@ -52,7 +52,7 @@ export function createPracticeView({ title, keyIndex, keyIndexes, tools = [], on
   const statsBar = el(
     'header',
     { class: 'practice-bar' },
-    el('a', { class: 'practice-bar__back', href: '#/', 'aria-label': text.back }, '←'),
+    el('a', { class: 'practice-bar__back', href: '#/inicio', 'aria-label': text.back }, '←'),
     el('h1', { class: 'practice-bar__title' }, title),
     el(
       'dl',

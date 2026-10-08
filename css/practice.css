@@ -85,7 +85,8 @@ main:has(> .practice-screen) {
   gap: 0.35em;
 }
 
-.tool label {
+.tool label,
+.tool--info {
   color: var(--color-text-muted);
 }
 

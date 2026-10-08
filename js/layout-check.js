@@ -102,6 +102,16 @@ export function createLayoutInference(keyIndexes, selectedId, onChange) {
   return { observe, reset };
 }
 
+/**
+ * Calibration: ids of the registered layouts whose base layer produces `key` on the
+ * physical key `code` ('Dead' matches layouts where that key is a dead key).
+ */
+export function layoutsMatchingKey(keyIndexes, code, key) {
+  return keyIndexes
+    .filter((index) => sameChar(key, index.isDead(code, 'base') ? DEAD : index.charFor(code, 'base')))
+    .map((index) => index.layout.id);
+}
+
 // Case-insensitive so CapsLock does not count as a layout difference.
 function sameChar(a, b) {
   return a !== undefined && b !== undefined && a.toLowerCase() === b.toLowerCase();

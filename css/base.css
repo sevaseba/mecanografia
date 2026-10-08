@@ -79,6 +79,11 @@ a {
   background: var(--color-accent-hover);
 }
 
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .button--secondary {
   background: transparent;
   color: var(--color-link);
