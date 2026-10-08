@@ -19,6 +19,8 @@ import { createKeyboardView } from './keyboard-view.js';
 import { createHandsView } from './hands-view.js';
 import { createTextLineView } from './text-line-view.js';
 import { createLayoutInference, detectSystemLayout } from './layout-check.js';
+import { playHit, playMiss } from './sound.js';
+import { pickOne } from './random.js';
 
 const text = strings.practice;
 const UPCOMING_CHARS = 3;
@@ -34,8 +36,17 @@ const MISS_SIGNAL_MS = 400;
  * @param {Node[]} [options.tools]        screen-specific controls for the stats bar
  * @param {(layoutId: string) => void} [options.onLayoutSuggestion]  "use this layout" button
  * @param {(session: object) => void} [options.onFinish]  the current text was completed
+ * @param {() => boolean} [options.soundEnabled]  play a sound for each right/wrong key
  */
-export function createPracticeView({ title, keyIndex, keyIndexes, tools = [], onLayoutSuggestion, onFinish }) {
+export function createPracticeView({
+  title,
+  keyIndex,
+  keyIndexes,
+  tools = [],
+  onLayoutSuggestion,
+  onFinish,
+  soundEnabled = () => false,
+}) {
   const state = {
     keyIndex,
     session: createTypingSession(''),
@@ -118,6 +129,7 @@ export function createPracticeView({ title, keyIndex, keyIndexes, tools = [], on
 
   // Physical key that produced the latest text, to flash it green or red.
   let lastCharKeyCode = null;
+  let lastCheer;
 
   const input = attachKeyboardInput(textarea, {
     onKey: (key) => {
@@ -128,16 +140,21 @@ export function createPracticeView({ title, keyIndex, keyIndexes, tools = [], on
     onText: (chars) => {
       const wasDone = state.session.done;
       // Kids mode waits on the expected character; adult mode moves on and marks the error.
-      const advanceOnError = document.documentElement.dataset.mode !== 'kids';
+      const advanceOnError = !isKids();
       for (const char of chars) {
         const correct = state.session.type(char, { advanceOnError });
         if (correct === null) continue;
         keyboard.flashResult(lastCharKeyCode, correct);
+        if (soundEnabled()) (correct ? playHit : playMiss)();
         if (!correct && !advanceOnError) signalMiss();
       }
       render();
       if (!wasDone && state.session.done) {
-        announce(`${text.finished} ${text.finishedStats(computeStats(state.session))}`);
+        // Kids get a different cheer each time; adults a plain "done".
+        const cheer = isKids() ? pickOne(strings.encouragement.exerciseDone, lastCheer) : text.finished;
+        lastCheer = cheer;
+        finishMessage.querySelector('.practice-finish__title').textContent = cheer;
+        announce(`${cheer} ${text.finishedStats(computeStats(state.session))}`);
         onFinish?.(state.session);
       }
     },
@@ -302,6 +319,8 @@ export function createPracticeView({ title, keyIndex, keyIndexes, tools = [], on
   render();
   return { element, focus: () => textarea.focus(), setText, setLayout, restart, refresh: render, destroy };
 }
+
+const isKids = () => document.documentElement.dataset.mode === 'kids';
 
 function stat(label, values, className, hideLabel = false) {
   return el('div', { class: className }, el('dt', { class: hideLabel ? 'visually-hidden' : null }, label), el('dd', {}, values));

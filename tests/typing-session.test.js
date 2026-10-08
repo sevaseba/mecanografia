@@ -36,17 +36,51 @@ test('combined stats add up several exercises, ignoring the pauses between them'
   const { combineStats } = await import('../js/stats.js');
   let clock = 0;
   const now = () => clock;
-  const first = createTypingSession('ab', { now });
-  first.type('a');
-  clock = 6000;
-  first.type('x'); // wrong, 6 s
-  clock = 100000; // a long pause before the next exercise
-  const second = createTypingSession('cd', { now });
-  second.type('c');
-  clock = 106000;
-  second.type('d'); // 6 s
+  // Exercise 1: 5 keystrokes, one wrong left uncorrected; 6 s from first to last keystroke.
+  const first = createTypingSession('abcde', { now });
+  for (const char of 'abcdx') {
+    first.type(char);
+    clock += 1500;
+  }
+  clock = 100000; // a long pause before the next exercise does not count
+  // Exercise 2: one error corrected with Backspace, then all right; 5 s.
+  const second = createTypingSession('fghij', { now });
+  for (const char of 'fz') {
+    second.type(char);
+    clock += 1000;
+  }
+  second.backspace();
+  for (const char of 'ghij') {
+    second.type(char);
+    if (char !== 'j') clock += 1000;
+  }
   const stats = combineStats([first, second]);
-  assert.equal(stats.accuracy, 75); // 3 of 4 keystrokes right
-  assert.equal(stats.durationMs, 12000);
-  assert.equal(stats.wpm, 3); // 3 correct chars / 5 / 0.2 min
+  assert.equal(stats.durationMs, 6000 + 5000);
+  assert.equal(stats.uncorrectedErrors, 1);
+  assert.equal(stats.correctedErrors, 1);
+  assert.equal(stats.accuracy, 82); // 9 of 11 keystrokes right
+  // gross: 11 keystrokes / 5 / (11 s) = 12 WPM; net: (11 / 5 - 1 uncorrected) / (11 s) = 6.5
+  assert.equal(stats.grossWpm, 12);
+  assert.equal(stats.wpm, 7);
+  assert.deepEqual(stats.keyStats.e, [1, 1]);
+  assert.deepEqual(stats.keyStats.g, [1, 2]);
+  assert.deepEqual(stats.keyStats.a, [0, 1]);
+});
+
+test('net WPM never goes below zero', async () => {
+  const { combineStats } = await import('../js/stats.js');
+  let clock = 0;
+  const session = createTypingSession('ab', { now: () => clock });
+  session.type('x');
+  clock = 3000;
+  session.type('y');
+  assert.equal(combineStats([session]).wpm, 0);
+});
+
+test('key tally counts attempts and errors per expected character', () => {
+  const session = createTypingSession('ab', { now: () => 0 });
+  session.type('x', { advanceOnError: false });
+  session.type('a', { advanceOnError: false });
+  session.type('b', { advanceOnError: false });
+  assert.deepEqual(session.keyTally(), { a: [1, 2], b: [0, 1] });
 });

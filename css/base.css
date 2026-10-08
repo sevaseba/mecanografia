@@ -56,6 +56,11 @@ a {
   color: var(--color-link);
 }
 
+/* The hidden attribute always wins, even over components that set their own display. */
+[hidden] {
+  display: none !important;
+}
+
 /* Visible focus for every interactive element, keyboard-only. */
 :focus-visible {
   outline: var(--focus-width) solid var(--color-focus);

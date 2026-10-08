@@ -1,5 +1,6 @@
 // A lesson (#/lecciones/:id): its fixed exercises plus a random one, typed in a row on the
-// practice view, then the results (accuracy, stars) saved to the profile's progress.
+// practice view, then the results saved to the profile's progress. Kids get cheers, medals
+// and confetti; adults get gross/net WPM and corrected/uncorrected errors.
 
 import { el } from '../dom.js';
 import { strings } from '../strings.js';
@@ -9,10 +10,22 @@ import { profiles } from '../profiles.js';
 import { layouts, getLayout } from '../layouts/index.js';
 import { createKeyIndex } from '../keystrokes.js';
 import { combineStats } from '../stats.js';
-import { getCourse, lessonStates, recordAttempt, starsFor, PASS_ACCURACY } from '../course.js';
+import {
+  getCourse,
+  lessonStates,
+  recordAttempt,
+  starsFor,
+  exercisesFor,
+  randomExerciseLength,
+  PASS_ACCURACY,
+} from '../course.js';
 import { randomExercise } from '../exercise-generator.js';
 import { createPracticeView } from '../practice-view.js';
-import { renderStars, renderKeycaps } from '../lesson-badges.js';
+import { renderStars, renderKeycaps, renderMedal } from '../lesson-badges.js';
+import { newMedals } from '../achievements.js';
+import { createSoundToggle } from '../sound-toggle.js';
+import { launchConfetti } from '../confetti.js';
+import { pickOne } from '../random.js';
 
 const text = strings.lessons;
 const keyIndexes = layouts.map(createKeyIndex);
@@ -51,9 +64,15 @@ export function render(container, params) {
   );
 
   function start(course, lesson) {
-    const exercises = [...lesson.exercises, randomExercise(lesson)];
+    const mode = profiles.get(profile.id).mode;
+    const exercises = [
+      ...exercisesFor(lesson, mode),
+      randomExercise(lesson, { length: randomExerciseLength(lesson, mode) }),
+    ];
     const sessions = [];
     const counter = el('span', { class: 'tool tool--info' });
+    const soundToggle = createSoundToggle(profile.id);
+    soundToggle.classList.add('only-kids');
     const restartButton = el(
       'button',
       { type: 'button', class: 'button button--secondary button--small', onClick: () => start(course, lesson) },
@@ -66,7 +85,8 @@ export function render(container, params) {
       title: text.lessonTitle(lesson.number, lesson.title),
       keyIndex: keyIndexes.find((index) => index.layout.id === profile.layoutId),
       keyIndexes,
-      tools: [counter, restartButton],
+      tools: [counter, soundToggle, restartButton],
+      soundEnabled: () => profiles.get(profile.id)?.settings.sound ?? false,
       onFinish: (session) => {
         sessions.push(session);
         pauseTimer = setTimeout(() => {
@@ -89,21 +109,27 @@ export function render(container, params) {
   function finish(course, lesson, sessions) {
     const stats = combineStats(sessions);
     const before = profiles.progressFor(profile.id, profile.layoutId).lessons?.[lesson.id];
+    const now = new Date();
     const progress = recordAttempt(
       profiles.progressFor(profile.id, profile.layoutId),
       lesson.id,
-      { accuracy: stats.accuracy ?? 0, wpm: stats.wpm, durationMs: stats.durationMs },
-      new Date().toISOString(),
+      { accuracy: stats.accuracy ?? 0, wpm: stats.wpm, durationMs: stats.durationMs, keyStats: stats.keyStats },
+      now.toISOString(),
     );
     profiles.saveProgress(profile.id, profile.layoutId, progress);
+    const medals = newMedals(profiles.get(profile.id), course, now);
+    if (medals.length) profiles.awardMedals(profile.id, medals, now.toISOString());
 
     view.destroy();
     view = null;
     const stars = starsFor(stats.accuracy ?? 0);
     const isRecord = before && stats.accuracy > before.bestAccuracy;
-    container.replaceChildren(results({ course, lesson, stats, stars, isRecord, retry: () => start(course, lesson) }));
+    const kids = profiles.get(profile.id).mode === 'kids';
+    const screen = results({ course, lesson, stats, stars, isRecord, kids, medals, retry: () => start(course, lesson) });
+    container.replaceChildren(screen);
     container.querySelector('.results .button')?.focus();
-    announce(`${stars > 0 ? text.passedTitle : text.failedTitle} ${text.stars(stars)}. ${text.accuracy(stats.accuracy ?? 0)}`);
+    announce(screen.querySelector('h1').textContent);
+    if (kids && stars > 0) launchConfetti();
   }
 
   return () => {
@@ -113,8 +139,24 @@ export function render(container, params) {
   };
 }
 
-function results({ course, lesson, stats, stars, isRecord, retry }) {
+function medalsEarned(course, medals) {
+  return el(
+    'div',
+    { class: 'results__medals' },
+    el('p', { class: 'results__record' }, medals.length === 1 ? strings.medals.earnedNow : strings.medals.earnedNowMany),
+    el('ul', { class: 'medal-list' }, medals.map((medalId) => el('li', {}, renderMedal(medalId, course, true)))),
+  );
+}
+
+function results({ course, lesson, stats, stars, isRecord, kids, medals, retry }) {
   const passed = stars > 0;
+  // Kids: varied, always positive words. Adults: plain facts.
+  const heading = kids ? pickOne(passed ? strings.encouragement.passed : strings.encouragement.retry) : passed ? text.passedTitle : text.failedTitle;
+  const message = kids
+    ? pickOne(passed ? strings.encouragement.passedMessage : strings.encouragement.retryMessage)
+    : passed
+      ? text.passedMessage(stars)
+      : text.failedMessage(PASS_ACCURACY);
   const next = course.next(lesson.id);
   const actions = [];
   if (passed && next) {
@@ -134,16 +176,24 @@ function results({ course, lesson, stats, stars, isRecord, retry }) {
       el('span', { class: 'muted' }, text.lessonTitle(lesson.number, lesson.title)),
       renderKeycaps(lesson.newKeys, text.review),
     ),
-    el('h1', {}, passed ? text.passedTitle : text.failedTitle),
+    el('h1', {}, heading),
     renderStars(stars, { large: true }),
     el(
       'p',
       { class: 'results__stats' },
       el('span', {}, text.accuracy(stats.accuracy ?? 0)),
-      el('span', { class: 'only-adult' }, text.wpm(stats.wpm)),
+      el('span', { class: 'only-adult' }, text.netWpm(stats.wpm)),
+      el('span', { class: 'only-adult' }, text.grossWpm(stats.grossWpm)),
+    ),
+    el(
+      'p',
+      { class: 'results__details only-adult' },
+      el('span', {}, text.correctedErrors(stats.correctedErrors)),
+      el('span', {}, text.uncorrectedErrors(stats.uncorrectedErrors)),
     ),
     isRecord ? el('p', { class: 'results__record' }, text.newRecord) : null,
-    el('p', {}, passed ? text.passedMessage(stars) : text.failedMessage(PASS_ACCURACY)),
+    el('p', {}, message),
+    kids && medals.length ? medalsEarned(course, medals) : null,
     passed && !next ? el('p', { class: 'results__record' }, text.courseFinished) : null,
     el('div', { class: 'results__actions' }, actions),
   );

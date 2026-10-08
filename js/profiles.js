@@ -1,11 +1,12 @@
 // Profile operations on top of the store: list, create, edit, delete, active profile and
 // per-layout progress.
 
-import { createStore } from './storage.js';
+import { createStore, defaultSettings } from './storage.js';
 import { getLayout } from './layouts/index.js';
 
 export const AVATARS = ['🦊', '🐼', '🐸', '🦁', '🐙', '🦄', '🐢', '🐧', '🐱', '🐶', '🦉', '🐝', '🚀', '⚽', '🎸', '🌵'];
 export const MODES = ['kids', 'adult'];
+export const THEMES = ['auto', 'light', 'dark'];
 const NAME_MAX_LENGTH = 30;
 
 export class ProfileError extends Error {
@@ -61,6 +62,8 @@ export function createProfileService(store, { now = () => new Date(), newId = ra
           ...validate(data, fields),
           createdAt: timestamp,
           updatedAt: timestamp,
+          settings: defaultSettings(),
+          medals: {},
           progress: {},
         };
         data.profiles.push(profile);
@@ -90,6 +93,29 @@ export function createProfileService(store, { now = () => new Date(), newId = ra
     setActive(id) {
       change((data) => {
         data.activeProfileId = id && find(data, id) ? id : null;
+      });
+    },
+
+    /** settings: partial { sound, theme }. */
+    updateSettings(id, settings) {
+      const valid =
+        (settings.sound === undefined || typeof settings.sound === 'boolean') &&
+        (settings.theme === undefined || THEMES.includes(settings.theme));
+      if (!valid) throw new ProfileError('invalid');
+      return change((data) => {
+        const profile = find(data, id);
+        if (!profile) throw new ProfileError('not-found');
+        profile.settings = { ...profile.settings, ...settings };
+        return structuredClone(profile.settings);
+      });
+    },
+
+    /** Records medals as earned on `date`; medals already earned keep their first date. */
+    awardMedals(id, medalIds, date) {
+      change((data) => {
+        const profile = find(data, id);
+        if (!profile) throw new ProfileError('not-found');
+        for (const medalId of medalIds) profile.medals[medalId] ??= date;
       });
     },
 

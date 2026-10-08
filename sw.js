@@ -2,7 +2,7 @@
 // Bump CACHE_VERSION whenever any precached file changes (lessons included), and add new
 // files to PRECACHE. Lesson files are not listed: they are read from each course index.json.
 
-const CACHE_VERSION = 'v18';
+const CACHE_VERSION = 'v23';
 const CACHE_NAME = `mecanografia-${CACHE_VERSION}`;
 
 const PRECACHE = [
@@ -15,9 +15,12 @@ const PRECACHE = [
   './css/practice.css',
   './css/profiles.css',
   './css/lessons.css',
+  './css/progress.css',
   './js/app.js',
+  './js/achievements.js',
   './js/announcer.js',
   './js/calibration-view.js',
+  './js/confetti.js',
   './js/course.js',
   './js/dialog.js',
   './js/dom.js',
@@ -31,12 +34,17 @@ const PRECACHE = [
   './js/lesson-badges.js',
   './js/practice-view.js',
   './js/profiles.js',
+  './js/pwa.js',
+  './js/random.js',
   './js/router.js',
+  './js/sound-toggle.js',
+  './js/sound.js',
   './js/stats.js',
   './js/storage.js',
   './js/strings.js',
   './js/text-line-view.js',
   './js/typing-session.js',
+  './js/wpm-chart.js',
   './js/layouts/index.js',
   './js/layouts/es-latam.js',
   './js/layouts/en-us.js',
@@ -47,11 +55,13 @@ const PRECACHE = [
   './js/screens/not-found.js',
   './js/screens/profile-form.js',
   './js/screens/profile-picker.js',
+  './js/screens/progress.js',
   './icons/icon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png',
+  './assets/fonts/nunito-latin.woff2',
   './lessons/es-latam/index.json',
   './lessons/en-us/index.json',
 ];
@@ -72,8 +82,14 @@ async function precache() {
   }
 }
 
+// A new version waits ("installed") until the page asks it to take over, after the user
+// accepts the "update available" banner (see js/pwa.js).
 self.addEventListener('install', (event) => {
-  event.waitUntil(precache().then(() => self.skipWaiting()));
+  event.waitUntil(precache());
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'skip-waiting') self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {

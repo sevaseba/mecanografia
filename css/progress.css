@@ -1,0 +1,260 @@
+/* "Mi progreso", medals, confetti and the PWA update banner. */
+
+.field--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.stat-tiles {
+  list-style: none;
+  margin: 0 0 var(--space-lg);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-md);
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.stat-tile__label {
+  font-weight: 600;
+}
+
+.stat-tile__value {
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-tile__hint {
+  font-size: 0.8em;
+  color: var(--color-text-muted);
+}
+
+.progress-section {
+  margin-bottom: var(--space-lg);
+}
+
+.progress-section h2 {
+  font-size: 1.25em;
+}
+
+/* --- WPM chart --- */
+
+.wpm-chart {
+  margin: 0;
+}
+
+.wpm-chart figcaption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.wpm-chart__plot {
+  position: relative;
+  max-width: 44rem;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.wpm-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.wpm-chart__grid {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.wpm-chart__axis {
+  fill: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.wpm-chart__line {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.wpm-chart__point {
+  fill: var(--color-accent);
+  stroke: var(--color-surface);
+  stroke-width: 2;
+}
+
+.wpm-chart__label {
+  fill: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.wpm-chart__crosshair {
+  stroke: var(--color-text-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.wpm-chart__focus {
+  fill: none;
+  stroke: var(--color-focus);
+  stroke-width: 3;
+}
+
+.wpm-chart__tooltip {
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, calc(-100% - 12px));
+  padding: 0.3em 0.6em;
+  border-radius: 6px;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: 0.85em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.wpm-chart__table {
+  margin-top: var(--space-sm);
+}
+
+.wpm-chart__table summary {
+  cursor: pointer;
+  color: var(--color-link);
+}
+
+.wpm-chart__table table {
+  margin-top: var(--space-sm);
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.wpm-chart__table th,
+.wpm-chart__table td {
+  padding: 0.2em 0.8em;
+  border-bottom: 1px solid var(--color-border);
+  text-align: right;
+}
+
+/* --- Trouble keys --- */
+
+.trouble-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-lg);
+  padding-left: 1.4em;
+}
+
+.trouble-list kbd {
+  padding: 0.05em 0.45em;
+  border: 1px solid var(--color-key-border);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  background: var(--color-key);
+  color: var(--color-key-text);
+  font: 600 1em ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+.progress-keyboard {
+  --unit: min(2.3rem, calc((100vw - 3rem) / 16.6));
+  --gap: calc(var(--unit) * 0.1);
+
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* --- Medals --- */
+
+.medal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.medal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.3em 0.8em;
+  border: 2px dashed var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+}
+
+.medal--earned {
+  border-style: solid;
+  border-color: var(--color-star);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.medal__icon {
+  font-size: 1.4em;
+}
+
+.progress-section .medal-list {
+  justify-content: flex-start;
+}
+
+/* --- Confetti and update banner --- */
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+.update-banner {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-md);
+  z-index: 40;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  max-width: calc(100vw - 2rem);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: 16px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.3);
+}
+
+.update-banner p {
+  margin: 0;
+}
+
+.install-slot {
+  margin-top: var(--space-lg);
+}

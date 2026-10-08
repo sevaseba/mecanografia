@@ -6,6 +6,7 @@ import { redirect } from '../router.js';
 import { profiles } from '../profiles.js';
 import { getLayout } from '../layouts/index.js';
 import { getCourse, lessonStates } from '../course.js';
+import { createInstallButton } from '../pwa.js';
 
 const text = strings.home;
 
@@ -55,9 +56,11 @@ export function render(container) {
     el(
       'nav',
       { class: 'home-links', 'aria-label': strings.appName },
+      el('a', { href: '#/progreso' }, text.progress),
       el('a', { href: '#/' }, text.switchProfile),
       el('a', { href: `#/perfiles/${encodeURIComponent(profile.id)}/editar` }, text.editProfile),
     ),
+    el('div', { class: 'install-slot' }, createInstallButton()),
   );
 
   // Where to continue: the recommended lesson of this profile's course (ignored if the

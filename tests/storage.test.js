@@ -28,6 +28,8 @@ const profile = (overrides = {}) => ({
   createdAt: '2026-10-08T00:00:00.000Z',
   updatedAt: '2026-10-08T00:00:00.000Z',
   progress: {},
+  settings: { sound: false, theme: 'auto' },
+  medals: {},
   ...overrides,
 });
 
@@ -132,4 +134,23 @@ test('rejects files that are not backups, with a reason', () => {
   assert.equal(reason('hola'), 'not-json');
   assert.equal(reason('{"foo": 1}'), 'not-backup');
   assert.equal(reason(JSON.stringify({ app: 'mecanografia', type: 'backup', data: { version: 99, profiles: [] } })), 'newer-version');
+});
+
+test('migrates version 1 documents: adds settings and medals', () => {
+  const v1 = { version: 1, activeProfileId: 'p1', profiles: [profile({ settings: undefined, medals: undefined })] };
+  const data = createStore(memoryBackend({ [STORAGE_KEY]: JSON.stringify(v1) })).read();
+  assert.equal(data.version, 2);
+  assert.deepEqual(data.profiles[0].settings, { sound: false, theme: 'auto' });
+  assert.deepEqual(data.profiles[0].medals, {});
+});
+
+test('normalizes settings and medals', () => {
+  const stored = {
+    version: 2,
+    activeProfileId: null,
+    profiles: [profile({ settings: { sound: 'yes', theme: 'neon' }, medals: { a: 'T1', b: 5 } })],
+  };
+  const data = createStore(memoryBackend({ [STORAGE_KEY]: JSON.stringify(stored) })).read();
+  assert.deepEqual(data.profiles[0].settings, { sound: false, theme: 'auto' });
+  assert.deepEqual(data.profiles[0].medals, { a: 'T1' });
 });

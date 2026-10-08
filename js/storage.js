@@ -5,7 +5,9 @@
 //   activeProfileId: string | null,
 //   profiles: [{
 //     id, name, avatar, mode: 'kids' | 'adult', layoutId, createdAt, updatedAt,
-//     progress: { [layoutId]: object }   // one course progress per layout (stage 4)
+//     settings: { sound: boolean, theme: 'auto' | 'light' | 'dark' },
+//     medals: { [medalId]: ISO date earned },
+//     progress: { [layoutId]: object }   // one course progress per layout (see course.js)
 //   }]
 // }
 //
@@ -15,12 +17,24 @@
 import { getLayout, defaultLayoutId } from './layouts/index.js';
 
 export const STORAGE_KEY = 'mecanografia';
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 // MIGRATIONS[n] turns a version-n document into a version-(n + 1) one.
-const MIGRATIONS = {};
+const MIGRATIONS = {
+  // v2: per-profile settings (sound, theme) and medals.
+  1: (document) => ({
+    ...document,
+    version: 2,
+    profiles: (document.profiles ?? []).map((profile) => ({ ...profile, settings: defaultSettings(), medals: {} })),
+  }),
+};
 
 const MODES = ['kids', 'adult'];
+const THEMES = ['auto', 'light', 'dark'];
+
+export function defaultSettings() {
+  return { sound: false, theme: 'auto' };
+}
 const NAME_MAX_LENGTH = 30;
 const BACKUP_APP = 'mecanografia';
 const BACKUP_TYPE = 'backup';
@@ -154,9 +168,24 @@ function normalizeProfile(profile) {
     layoutId: getLayout(profile.layoutId) ? profile.layoutId : defaultLayoutId,
     createdAt: typeof profile.createdAt === 'string' ? profile.createdAt : new Date(0).toISOString(),
     updatedAt: typeof profile.updatedAt === 'string' ? profile.updatedAt : new Date(0).toISOString(),
+    settings: normalizeSettings(profile.settings),
+    medals: Object.fromEntries(
+      Object.entries(isObject(profile.medals) ? profile.medals : {}).filter(([, date]) => typeof date === 'string'),
+    ),
     progress,
   };
 }
+
+function normalizeSettings(settings) {
+  const defaults = defaultSettings();
+  if (!isObject(settings)) return defaults;
+  return {
+    sound: typeof settings.sound === 'boolean' ? settings.sound : defaults.sound,
+    theme: THEMES.includes(settings.theme) ? settings.theme : defaults.theme,
+  };
+}
+
+const isObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
 function browserStorage() {
   try {

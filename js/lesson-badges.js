@@ -2,6 +2,7 @@
 
 import { el } from './dom.js';
 import { strings } from './strings.js';
+import { medalIcon } from './achievements.js';
 
 const MAX_STARS = 3;
 const MAX_KEYCAPS = 6;
@@ -13,6 +14,20 @@ export function renderStars(count, { large = false } = {}) {
     Array.from({ length: MAX_STARS }, (_, i) =>
       el('span', { class: i < count ? 'star star--on' : 'star' }, i < count ? '★' : '☆'),
     ),
+  );
+}
+
+/** A medal: icon + name; unit medals take the unit title from the course. */
+export function renderMedal(medalId, course, earned) {
+  const unitIndex = medalId.startsWith('unit:') ? Number(medalId.split(':')[2]) : null;
+  const name =
+    unitIndex === null ? strings.medals.names[medalId] : strings.medals.unit(course.units[unitIndex]?.title ?? '');
+  return el(
+    'span',
+    { class: earned ? 'medal medal--earned' : 'medal' },
+    el('span', { class: 'medal__icon', 'aria-hidden': 'true' }, earned ? medalIcon(medalId) : '🔒'),
+    el('span', { class: 'medal__name' }, name),
+    earned ? null : el('span', { class: 'visually-hidden' }, `(${strings.medals.locked})`),
   );
 }
 

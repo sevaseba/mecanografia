@@ -4,7 +4,7 @@ import { el } from '../dom.js';
 import { strings } from '../strings.js';
 import { navigate, redirect } from '../router.js';
 import { confirmDialog } from '../dialog.js';
-import { profiles, AVATARS, MODES, ProfileError } from '../profiles.js';
+import { profiles, AVATARS, MODES, THEMES, ProfileError } from '../profiles.js';
 import { layouts, defaultLayoutId } from '../layouts/index.js';
 import { createKeyIndex } from '../keystrokes.js';
 import { detectSystemLayout } from '../layout-check.js';
@@ -56,6 +56,17 @@ export function render(container, params) {
     initial.mode,
     'option-grid',
   );
+  // Theme only matters in adult mode (kids mode is always light).
+  const themeField = radioGroup(
+    'theme',
+    strings.theme.label,
+    THEMES.map((theme) => ({ value: theme, label: optionCard(strings.theme.options[theme], '') })),
+    editing?.settings.theme ?? 'auto',
+    'option-grid option-grid--compact',
+  );
+  const syncThemeVisibility = () => {
+    themeField.element.hidden = modeField.value() !== 'adult';
+  };
   const layoutField = radioGroup(
     'layout',
     text.layoutLabel,
@@ -70,6 +81,8 @@ export function render(container, params) {
     onUseLayout: (layoutId) => setLayout(layoutId),
   });
   layoutField.element.addEventListener('change', () => calibration.setLayout(layoutField.value()));
+  modeField.element.addEventListener('change', syncThemeVisibility);
+  syncThemeVisibility();
 
   // A new profile starts with the layout the computer is using, when the browser can tell.
   if (!editing) {
@@ -91,6 +104,7 @@ export function render(container, params) {
     el('div', { class: 'field' }, el('label', { for: 'profile-name' }, text.nameLabel), nameInput, nameError),
     avatarField.element,
     modeField.element,
+    themeField.element,
     layoutField.element,
     el('details', { class: 'calibration-details' }, el('summary', {}, strings.calibration.title), calibration.element),
     formError,
@@ -111,8 +125,8 @@ export function render(container, params) {
       layoutId: layoutField.value(),
     };
     try {
-      if (editing) profiles.update(editing.id, fields);
-      else profiles.create(fields);
+      const saved = editing ? profiles.update(editing.id, fields) : profiles.create(fields);
+      profiles.updateSettings(saved.id, { theme: themeField.value() });
     } catch (error) {
       if (!(error instanceof ProfileError)) throw error;
       showError(error.reason);
@@ -175,7 +189,7 @@ function optionCard(name, description) {
     'span',
     { class: 'option-card' },
     el('span', { class: 'option-card__name' }, name),
-    el('span', { class: 'option-card__description' }, description),
+    description ? el('span', { class: 'option-card__description' }, description) : null,
   );
 }
 

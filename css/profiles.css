@@ -152,6 +152,10 @@ input[aria-invalid="true"] {
   gap: 0.75rem;
 }
 
+.option-grid--compact {
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
 /* Native radios kept focusable and in place, drawn as tiles. */
 .choice-tile {
   position: relative;

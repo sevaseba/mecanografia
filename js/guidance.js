@@ -7,7 +7,7 @@
 //   badge            1 / 2 to show the order when there are two steps, else null
 
 // Lower is more urgent. A key or finger with two roles shows the most urgent one.
-export const ROLE_RANK = { primary: 0, modifier: 1, secondary: 2 };
+export const ROLE_RANK = { primary: 0, modifier: 1, secondary: 2, trouble: 3 };
 
 export function guideFor(keyIndex, char, deadPending) {
   const strokes = char === undefined ? null : keyIndex.strokesFor(char);

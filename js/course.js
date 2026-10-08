@@ -7,6 +7,8 @@
 
 export const HISTORY_LIMIT = 200;
 const STAR_THRESHOLDS = [90, 95, 98]; // accuracy % for 1, 2 and 3 stars; 1 star = passed
+const KIDS_SHORT_UNITS = 3; // in kids mode, exercises of the first units are kept short…
+const KIDS_SHORT_LENGTH = 40; // …at most this many characters
 
 const courses = new Map(); // layoutId → Promise<course>
 
@@ -44,12 +46,12 @@ export function buildCourse(index, lessons) {
   const byId = new Map(lessons.map((lesson) => [lesson.id, lesson]));
   const allowed = new Set([' ']);
   const ordered = [];
-  const units = index.units.map((unit) => ({
+  const units = index.units.map((unit, unitIndex) => ({
     title: unit.title,
     lessons: unit.lessons.map((id) => {
       const lesson = byId.get(id);
       lesson.newKeys.forEach((key) => allowed.add(key));
-      const entry = { ...lesson, number: ordered.length + 1, allowedKeys: [...allowed] };
+      const entry = { ...lesson, number: ordered.length + 1, unitIndex, allowedKeys: [...allowed] };
       ordered.push(entry);
       return entry;
     }),
@@ -61,6 +63,27 @@ export function buildCourse(index, lessons) {
     get: (id) => ordered.find((lesson) => lesson.id === id) ?? null,
     next: (id) => ordered[ordered.findIndex((lesson) => lesson.id === id) + 1] ?? null,
   };
+}
+
+/** The lesson's fixed exercises for a mode: kids get short texts in the first units. */
+export function exercisesFor(lesson, mode) {
+  return isShortForKids(lesson, mode)
+    ? lesson.exercises.map((text) => trimToWords(text, KIDS_SHORT_LENGTH))
+    : lesson.exercises;
+}
+
+/** Length for the random exercise, consistent with exercisesFor (undefined = default). */
+export function randomExerciseLength(lesson, mode) {
+  return isShortForKids(lesson, mode) ? KIDS_SHORT_LENGTH : undefined;
+}
+
+const isShortForKids = (lesson, mode) => mode === 'kids' && lesson.unitIndex < KIDS_SHORT_UNITS;
+
+function trimToWords(text, maxLength) {
+  if (text.length <= maxLength) return text;
+  const cut = text.slice(0, maxLength + 1);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : text.slice(0, maxLength)).trimEnd();
 }
 
 export function starsFor(accuracy) {
@@ -91,7 +114,10 @@ export function lessonStates(course, progress, mode) {
   return states;
 }
 
-/** New progress after an attempt. result: { accuracy, wpm (may be null), durationMs }. */
+/**
+ * New progress after an attempt. result: { accuracy, wpm (may be null), durationMs, keyStats? }.
+ * keyStats ({ char: [errors, attempts] }) accumulate in progress.keyStats.
+ */
 export function recordAttempt(progress, lessonId, result, date) {
   const stars = starsFor(result.accuracy);
   const lessons = progress?.lessons ?? {};
@@ -107,5 +133,11 @@ export function recordAttempt(progress, lessonId, result, date) {
     ...(progress?.history ?? []),
     { lessonId, date, wpm: result.wpm, accuracy: result.accuracy, durationMs: result.durationMs, stars },
   ].slice(-HISTORY_LIMIT);
-  return { ...progress, lessons: { ...lessons, [lessonId]: updated }, history };
+  const keyStats = structuredClone(progress?.keyStats ?? {});
+  for (const [char, [errors, attempts]] of Object.entries(result.keyStats ?? {})) {
+    keyStats[char] ??= [0, 0];
+    keyStats[char][0] += errors;
+    keyStats[char][1] += attempts;
+  }
+  return { ...progress, lessons: { ...lessons, [lessonId]: updated }, history, keyStats };
 }

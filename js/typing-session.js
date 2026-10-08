@@ -8,6 +8,7 @@ export function createTypingSession(text, { now = () => Date.now() } = {}) {
   let mistakes = 0; // every wrong keystroke, even if later corrected
   let startedAt = null;
   let finishedAt = null;
+  const tally = {}; // expected character → [errors, attempts]
 
   return {
     target,
@@ -42,9 +43,13 @@ export function createTypingSession(text, { now = () => Date.now() } = {}) {
       if (typed.length >= target.length) return null;
       startedAt ??= now();
       const normalized = char.normalize('NFC');
-      const correct = normalized === target[typed.length];
+      const expected = target[typed.length];
+      const correct = normalized === expected;
       keystrokes += 1;
       if (!correct) mistakes += 1;
+      tally[expected] ??= [0, 0];
+      tally[expected][1] += 1;
+      if (!correct) tally[expected][0] += 1;
       if (!correct && !advanceOnError) return false;
       typed.push({ char: normalized, correct });
       if (typed.length === target.length) finishedAt = now();
@@ -53,6 +58,10 @@ export function createTypingSession(text, { now = () => Date.now() } = {}) {
     backspace() {
       if (finishedAt !== null) return;
       typed.pop();
+    },
+    /** Per expected character: [errors, attempts], to find the keys that cost the most. */
+    keyTally() {
+      return structuredClone(tally);
     },
   };
 }

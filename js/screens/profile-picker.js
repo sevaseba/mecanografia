@@ -9,6 +9,7 @@ import { confirmDialog } from '../dialog.js';
 import { profiles } from '../profiles.js';
 import { getLayout } from '../layouts/index.js';
 import { serializeBackup, parseBackup, BackupError } from '../storage.js';
+import { createInstallButton } from '../pwa.js';
 
 const text = strings.picker;
 
@@ -48,6 +49,7 @@ export function render(container) {
     ),
     backupSection(list.length, status, (message) => rerender(container, message)),
     status,
+    el('div', { class: 'install-slot' }, createInstallButton()),
   ];
   container.append(...children.filter(Boolean));
 }

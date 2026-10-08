@@ -98,6 +98,14 @@
 .key:is([data-role="primary"], [data-role="modifier"])[data-finger-group="2"] { background: var(--finger-2-strong); }
 .key:is([data-role="primary"], [data-role="modifier"])[data-finger-group="thumb"] { background: var(--finger-thumb-strong); }
 
+/* "Mi progreso": keys with most errors. */
+.key[data-role="trouble"] {
+  z-index: 1;
+  background: var(--color-wrong-bg) !important;
+  color: var(--color-wrong-text);
+  box-shadow: 0 0 0 3px var(--color-wrong-text);
+}
+
 /* Key to press right after (the letter following a dead key). */
 .key[data-role="secondary"] {
   z-index: 1;

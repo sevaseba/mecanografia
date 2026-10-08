@@ -37,6 +37,13 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │   ├── profiles.js       # alta/baja/edición de perfiles, perfil activo, progreso por distribución
 │   ├── dialog.js         # confirmación accesible con <dialog>
 │   ├── calibration-view.js # prueba opcional de teclado (tecla a la derecha de la L, etc.)
+│   ├── achievements.js   # racha de días, medallas y teclas con más errores
+│   ├── pwa.js            # registro del service worker, aviso de actualización, botón "Instalar app"
+│   ├── sound.js          # sonidos de acierto/error con Web Audio API
+│   ├── sound-toggle.js   # interruptor de sonido del perfil
+│   ├── confetti.js       # confeti al aprobar (modo infantil)
+│   ├── wpm-chart.js      # gráfico SVG de PPM, sin librerías
+│   ├── random.js         # elección al azar sin repetir (mensajes de ánimo)
 │   ├── input.js          # captura de teclado, teclas muertas, composición
 │   ├── keystrokes.js     # carácter ↔ secuencia de teclas físicas según la distribución
 │   ├── layout-check.js   # detección de distribución del SO vs. la elegida
@@ -63,7 +70,7 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │       └── 01-f-j.json, ...
 ├── tests/                # pruebas de la lógica pura: `node --test` desde la raíz
 ├── icons/                # íconos de la PWA (192, 512, maskable)
-└── assets/               # sonidos, ilustraciones, fuentes
+└── assets/fonts/         # Nunito (modo infantil), con su licencia OFL
 ```
 
 ## Lecciones
@@ -75,12 +82,19 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 - Reglas: aprobar con ≥ 90 % de precisión; estrellas 90/95/98 %; las PPM no condicionan. Infantil desbloquea en orden; adulto tiene todo abierto con la recomendada destacada.
 - El service worker guarda todas las lecciones leyendo cada `index.json`; al cambiar lecciones, subir `CACHE_VERSION`.
 
+## Modos
+
+- **Infantil:** tema claro alegre con Nunito, teclado más grande, ejercicios de las 3 primeras unidades recortados a 40 caracteres, la práctica espera la tecla correcta, mensajes de ánimo variados y **nunca negativos** (en `strings.encouragement`), estrellas, medallas, confeti y sonidos (apagados por defecto, interruptor en la práctica).
+- **Adulto:** tema Automático/Claro/Oscuro por perfil (`data-theme` en `<html>`, resuelto en `app.js`), PPM y precisión en vivo, textos completos, resultados con PPM bruto/neto y errores corregidos/no corregidos.
+- PPM bruto = pulsaciones / 5 / minutos; neto = bruto − errores no corregidos / minutos (nunca < 0). Es la PPM que se guarda y se promedia.
+
 ## Datos y perfiles
 
 - Todo se guarda en **una** clave de localStorage, `mecanografia`, como documento JSON con `version` (esquema documentado al principio de `js/storage.js`). Para cambiar la forma: subir `SCHEMA_VERSION` y agregar `MIGRATIONS[versiónVieja]`; nunca leer ni escribir localStorage fuera de `storage.js`.
-- El progreso va en `profile.progress[layoutId]`: un curso por distribución dentro del mismo perfil.
+- El progreso va en `profile.progress[layoutId]`: un curso por distribución dentro del mismo perfil, con `keyStats` (errores e intentos por carácter). En el perfil: `settings` (sonido, tema) y `medals` (se guardan al ganarse). Esquema actual: versión 2.
 - Respaldo: `{ app: "mecanografia", type: "backup", exportedAt, data }`. Importar valida, migra y reemplaza todo previa confirmación.
 - Pantallas que cargan datos de forma asíncrona deben devolver una función de limpieza y descartar resultados que lleguen después de salir de la pantalla (si no, dibujan dentro de la pantalla siguiente).
+- `#/progreso` muestra "Mi progreso" (promedios de las últimas 10 sesiones de lecciones, racha, gráfico, teclas con más errores, medallas en infantil), con selector de distribución.
 - Pantallas: `#/` elegir perfil (y respaldo; mostrarla deja sin perfil activo), `#/perfiles/nuevo`, `#/perfiles/:id/editar`, `#/inicio` del perfil activo, `#/lecciones` (mapa), `#/lecciones/:id`, `#/teclado-libre`. Las pantallas que necesitan un perfil activo redirigen a `#/`.
 - El modo (`data-mode` en `<html>`) y la distribución de la práctica salen del perfil activo.
 
@@ -104,7 +118,7 @@ Teclado libre y lecciones usan `practice-view.js`. Reglas de diseño:
 - Para identificar teclas físicas se usa `KeyboardEvent.code`. El carácter producido se toma de los eventos `input`/`compositionend` de un textarea oculto (no de `keydown`), porque ahí el sistema ya compuso las teclas muertas (´ + a → á). Ver `input.js`.
 - El formato de los archivos de distribución está documentado al principio de `js/layouts/es-latam.js`.
 - `navigator.keyboard.getLayoutMap()` (solo Chromium) devuelve únicamente la capa base, y las teclas muertas como su carácter de espaciado (`BracketLeft` → `´` en es-latam), nunca `"Dead"`. Verificado en Chrome 153 / Windows.
-- Cuando se agrega o renombra un archivo de la app, actualizar la lista de precache en `sw.js` y subir su versión de caché.
+- Cuando se agrega o renombra un archivo de la app, actualizar la lista de precache en `sw.js` y subir su versión de caché. El service worker nuevo **espera** a que el usuario acepte "Hay una actualización disponible" (no usa `skipWaiting` al instalarse).
 
 ## Regla de verificación
 

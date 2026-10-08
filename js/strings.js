@@ -104,8 +104,87 @@ export const strings = {
     again: 'Probar de nuevo',
   },
 
+  // Kids mode: varied and never negative. One is picked at random each time.
+  encouragement: {
+    exerciseDone: ['¡Bien!', '¡Muy bien!', '¡Genial!', '¡Así se hace!', '¡Bárbaro!', '¡Excelente!'],
+    passed: ['¡Lo lograste!', '¡Sos una máquina!', '¡Qué bien escribiste!', '¡Increíble!', '¡Lección superada!'],
+    passedMessage: [
+      'Tus dedos están aprendiendo un montón.',
+      'Cada día escribís mejor.',
+      '¡Seguí así y vas a escribir rapidísimo!',
+      'Tus manos ya conocen estas teclas.',
+    ],
+    retry: ['¡Vas muy bien!', '¡Buen intento!', '¡Seguí practicando!', '¡Ya casi lo tenés!'],
+    retryMessage: [
+      'Probemos otra vez, despacito, para ganar una estrella.',
+      'Mirá las manos de la pantalla y probá de nuevo.',
+      'Sin apuro: lo importante es apretar la tecla justa.',
+    ],
+  },
+
+  medals: {
+    title: 'Medallas',
+    earnedNow: '¡Ganaste una medalla nueva!',
+    earnedNowMany: '¡Ganaste medallas nuevas!',
+    locked: 'Todavía no',
+    names: {
+      'first-lesson': 'Primera lección',
+      'five-lessons': '5 lecciones',
+      'streak-3': 'Racha de 3 días',
+      'streak-7': 'Racha de 7 días',
+    },
+    unit: (unitTitle) => `Nivel completo: ${unitTitle}`,
+  },
+
+  sound: {
+    label: 'Sonido',
+    on: 'Sonido activado',
+    off: 'Sonido desactivado',
+  },
+
+  progress: {
+    title: 'Mi progreso',
+    back: 'Volver al inicio',
+    description: 'Tus números de las últimas sesiones de lecciones.',
+    layoutLabel: 'Distribución',
+    avgWpm: 'PPM promedio',
+    avgWpmHint: 'últimas 10 sesiones',
+    avgAccuracy: 'Precisión promedio',
+    lessonsPassed: 'Lecciones aprobadas',
+    streak: 'Racha',
+    streakDays: (days) => `${days} ${days === 1 ? 'día' : 'días'}`,
+    streakHint: 'seguidos, practicando',
+    chartTitle: 'Evolución de las PPM',
+    chartSummary: (count, min, max, last) =>
+      `PPM en las últimas ${count} sesiones: mínimo ${min}, máximo ${max}, última ${last}.`,
+    chartAxisSessions: 'Sesiones',
+    chartTable: 'Ver los datos como tabla',
+    chartSession: 'Sesión',
+    chartTooltip: (number, date, wpm, accuracy) => `Sesión ${number} (${date}): ${wpm} PPM · ${accuracy} %`,
+    noSessions: 'Todavía no hay sesiones con esta distribución. ¡Hacé una lección para empezar!',
+    troubleTitle: 'Teclas con más errores',
+    troubleTitleKids: 'Teclas para practicar más',
+    troubleRate: (errorRate) => `${errorRate} % de errores`,
+    troubleNone: 'Todavía no hay suficientes datos de errores.',
+    spaceKey: 'espacio',
+    none: '–',
+  },
+
+  theme: {
+    label: 'Tema',
+    options: { auto: 'Automático (como el sistema)', light: 'Claro', dark: 'Oscuro' },
+  },
+
+  pwa: {
+    updateAvailable: 'Hay una actualización disponible.',
+    update: 'Actualizar',
+    install: 'Instalar app',
+    installHint: 'Instalá Mecanografía para abrirla como una app, también sin conexión.',
+  },
+
   home: {
     greeting: (name) => `¡Hola, ${name}!`,
+    progress: 'Mi progreso',
     lessons: 'Lecciones',
     lessonsDescription: 'Aprendé paso a paso, de la fila guía a los números.',
     continueWith: (number, title) => `Seguí con la lección ${number}: ${title}`,
@@ -136,13 +215,17 @@ export const strings = {
     exerciseCounter: (current, total) => `Ejercicio ${current} de ${total}`,
     restartLesson: 'Empezar de nuevo',
     passedTitle: '¡Lección aprobada!',
-    failedTitle: '¡Casi!',
+    failedTitle: 'Todavía no aprobaste',
     passedMessage: (stars) =>
       stars === 3 ? '¡Perfecta! Conseguiste las tres estrellas.' : 'Para más estrellas, buscá más precisión.',
     failedMessage: (needed) => `Para aprobar necesitás ${needed} % de precisión. ¡Probá de nuevo, sin apuro!`,
     newRecord: '¡Nuevo récord!',
     accuracy: (value) => `Precisión: ${value} %`,
     wpm: (value) => `Velocidad: ${value ?? '–'} PPM`,
+    netWpm: (value) => `PPM neto: ${value ?? '–'}`,
+    grossWpm: (value) => `PPM bruto: ${value ?? '–'}`,
+    correctedErrors: (count) => `Errores corregidos: ${count}`,
+    uncorrectedErrors: (count) => `Errores sin corregir: ${count}`,
     nextLesson: 'Siguiente lección',
     retry: 'Repetir',
     backToMap: 'Ver todas las lecciones',

@@ -4,35 +4,65 @@ const CHARS_PER_WORD = 5; // standard definition of a "word" for WPM
 const MIN_ELAPSED_MS = 2000; // below this, WPM is too noisy to show
 
 /**
+ * Live stats for one exercise.
  * @returns {{ wpm: number|null, accuracy: number|null, position: number, total: number }}
- *   wpm: words per minute counting only correct characters (null until there is enough data)
+ *   wpm: net words per minute (see netWpm), null until there is enough data
  *   accuracy: % of keystrokes that were right (null before the first keystroke)
  */
 export function computeStats(session, now = Date.now()) {
   const elapsedMs = session.startedAt === null ? 0 : (session.finishedAt ?? now) - session.startedAt;
-  const correctChars = session.typed.filter((entry) => entry.correct).length;
-  const wpm =
-    elapsedMs >= MIN_ELAPSED_MS ? Math.round(correctChars / CHARS_PER_WORD / (elapsedMs / 60000)) : null;
-  const accuracy =
-    session.keystrokes > 0
-      ? Math.round((100 * (session.keystrokes - session.mistakes)) / session.keystrokes)
-      : null;
-  return { wpm, accuracy, position: session.position, total: session.target.length };
+  return {
+    wpm: elapsedMs >= MIN_ELAPSED_MS ? netWpm(session.keystrokes, session.currentErrors, elapsedMs) : null,
+    accuracy: accuracyOf(session.keystrokes, session.mistakes),
+    position: session.position,
+    total: session.target.length,
+  };
 }
 
 /**
  * Stats for several exercises done in a row (a lesson). Time counts only while typing
  * each exercise, not the pauses between them.
+ *   grossWpm: every keystroke / 5 / minutes
+ *   wpm (net): gross minus uncorrected errors per minute, never below 0
+ *   correctedErrors: mistakes that were fixed (Backspace, or retyped in kids mode)
+ *   uncorrectedErrors: wrong characters left in the text
+ *   keyStats: per expected character, [errors, attempts]
  */
 export function combineStats(sessions) {
   const started = sessions.filter((session) => session.startedAt !== null);
-  const durationMs = started.reduce((sum, s) => sum + ((s.finishedAt ?? s.startedAt) - s.startedAt), 0);
-  const keystrokes = started.reduce((sum, s) => sum + s.keystrokes, 0);
-  const mistakes = started.reduce((sum, s) => sum + s.mistakes, 0);
-  const correctChars = started.reduce((sum, s) => sum + s.typed.filter((entry) => entry.correct).length, 0);
+  const sum = (pick) => started.reduce((total, session) => total + pick(session), 0);
+  const durationMs = sum((s) => (s.finishedAt ?? s.startedAt) - s.startedAt);
+  const keystrokes = sum((s) => s.keystrokes);
+  const mistakes = sum((s) => s.mistakes);
+  const uncorrectedErrors = sum((s) => s.currentErrors);
+  const enoughTime = durationMs >= MIN_ELAPSED_MS;
+
+  const keyStats = {};
+  for (const session of started) {
+    for (const [char, [errors, attempts]] of Object.entries(session.keyTally())) {
+      keyStats[char] ??= [0, 0];
+      keyStats[char][0] += errors;
+      keyStats[char][1] += attempts;
+    }
+  }
+
   return {
-    wpm: durationMs >= MIN_ELAPSED_MS ? Math.round(correctChars / CHARS_PER_WORD / (durationMs / 60000)) : null,
-    accuracy: keystrokes > 0 ? Math.round((100 * (keystrokes - mistakes)) / keystrokes) : null,
+    wpm: enoughTime ? netWpm(keystrokes, uncorrectedErrors, durationMs) : null,
+    grossWpm: enoughTime ? Math.round(keystrokes / CHARS_PER_WORD / minutes(durationMs)) : null,
+    accuracy: accuracyOf(keystrokes, mistakes),
+    correctedErrors: mistakes - uncorrectedErrors,
+    uncorrectedErrors,
     durationMs,
+    keyStats,
   };
 }
+
+function netWpm(keystrokes, uncorrectedErrors, elapsedMs) {
+  return Math.max(0, Math.round((keystrokes / CHARS_PER_WORD - uncorrectedErrors) / minutes(elapsedMs)));
+}
+
+function accuracyOf(keystrokes, mistakes) {
+  return keystrokes > 0 ? Math.round((100 * (keystrokes - mistakes)) / keystrokes) : null;
+}
+
+const minutes = (ms) => ms / 60000;

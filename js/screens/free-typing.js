@@ -7,6 +7,7 @@ import { profiles } from '../profiles.js';
 import { layouts } from '../layouts/index.js';
 import { createKeyIndex } from '../keystrokes.js';
 import { createPracticeView } from '../practice-view.js';
+import { createSoundToggle } from '../sound-toggle.js';
 
 const text = strings.freeTyping;
 const keyIndexes = layouts.map(createKeyIndex);
@@ -40,6 +41,9 @@ export function render(container) {
     strings.practice.restart,
   );
 
+  const soundToggle = createSoundToggle(profile.id);
+  soundToggle.classList.add('only-kids');
+
   const view = createPracticeView({
     title: text.title,
     keyIndex: indexFor(profile.layoutId),
@@ -47,8 +51,10 @@ export function render(container) {
     tools: [
       layoutName,
       el('div', { class: 'tool' }, el('label', { for: 'free-typing-sample' }, text.textLabel), sampleSelect),
+      soundToggle,
       restartButton,
     ],
+    soundEnabled: () => profiles.get(profile.id)?.settings.sound ?? false,
     // "Use this layout" in the layout warning changes the profile's layout.
     onLayoutSuggestion: (layoutId) => {
       profiles.update(profile.id, { layoutId });

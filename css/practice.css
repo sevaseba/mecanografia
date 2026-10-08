@@ -154,9 +154,10 @@ main:has(> .practice-screen) {
   --hand-w: calc(var(--hands-h) * 200 / 210);
 }
 
+/* Kids: a shorter text row and hands leave more height to the keyboard (bigger keys). */
 [data-mode="kids"] .practice-stage {
-  --line-h: 5rem;
-  --hands-h: 5rem;
+  --line-h: 4.2rem;
+  --hands-h: 4.2rem;
   --cue-h: 0px;
 }
 
