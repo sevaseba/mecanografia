@@ -1,0 +1,72 @@
+{
+  "layout": "es-latam",
+  "units": [
+    {
+      "title": "Fila guía",
+      "lessons": [
+        "01-f-j",
+        "02-d-k",
+        "03-s-l",
+        "04-a-enie",
+        "05-fila-guia"
+      ]
+    },
+    {
+      "title": "Estiramientos",
+      "lessons": [
+        "06-g-h"
+      ]
+    },
+    {
+      "title": "Fila superior",
+      "lessons": [
+        "07-e-i",
+        "08-r-u",
+        "09-t-y",
+        "10-w-o",
+        "11-q-p"
+      ]
+    },
+    {
+      "title": "Fila inferior",
+      "lessons": [
+        "12-v-m",
+        "13-c-coma",
+        "14-x-punto",
+        "15-z-guion",
+        "16-b-n"
+      ]
+    },
+    {
+      "title": "Mayúsculas",
+      "lessons": [
+        "17-mayusculas"
+      ]
+    },
+    {
+      "title": "Puntuación",
+      "lessons": [
+        "18-punto-y-coma-dos-puntos",
+        "19-pregunta",
+        "20-exclamacion"
+      ]
+    },
+    {
+      "title": "Tildes y diéresis",
+      "lessons": [
+        "21-a-e-acento",
+        "22-i-o-u-acento",
+        "23-dieresis",
+        "24-mayusculas-acentuadas"
+      ]
+    },
+    {
+      "title": "Números y símbolos",
+      "lessons": [
+        "25-numeros-1-5",
+        "26-numeros-6-0",
+        "27-simbolos"
+      ]
+    }
+  ]
+}

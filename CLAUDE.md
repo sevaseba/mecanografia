@@ -41,7 +41,10 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │   ├── keystrokes.js     # carácter ↔ secuencia de teclas físicas según la distribución
 │   ├── layout-check.js   # detección de distribución del SO vs. la elegida
 │   ├── typing-session.js # estado del ejercicio: texto objetivo, errores, tiempos
-│   ├── stats.js          # PPM y precisión
+│   ├── stats.js          # PPM y precisión (de un ejercicio o de varios seguidos)
+│   ├── course.js         # carga de cursos, estrellas, desbloqueo, recomendada, registro de intentos
+│   ├── exercise-generator.js # ejercicio al azar de cada lección
+│   ├── lesson-badges.js  # estrellas y teclas (keycaps) para mapa y resultados
 │   ├── guidance.js       # qué teclas y dedos iluminar para el próximo carácter
 │   ├── practice-view.js  # pantalla de práctica (teclado libre y lecciones)
 │   ├── text-line-view.js # línea única de texto que se desplaza
@@ -53,22 +56,32 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │       └── en-us.js
 ├── lessons/              # un curso por distribución
 │   ├── es-latam/
-│   │   ├── index.json    # orden de lecciones del curso
-│   │   └── 01-fila-guia.json, ...
+│   │   ├── index.json    # unidades y orden de lecciones del curso
+│   │   └── 01-f-j.json, ...
 │   └── en-us/
 │       ├── index.json
-│       └── 01-home-row.json, ...
+│       └── 01-f-j.json, ...
 ├── tests/                # pruebas de la lógica pura: `node --test` desde la raíz
 ├── icons/                # íconos de la PWA (192, 512, maskable)
 └── assets/               # sonidos, ilustraciones, fuentes
 ```
+
+## Lecciones
+
+- Formato: `index.json` = `{ layout, units: [{ title, lessons: [ids] }] }`; cada lección = `{ id, title, newKeys, exercises, words }`. Los JSON son la fuente de verdad y se editan a mano.
+- Teclas permitidas en una lección = espacio + todas las `newKeys` hasta esa lección inclusive. `tests/course.test.js` verifica que cada texto respete eso y que la distribución pueda escribirlo: correr `node --test` después de tocar lecciones.
+- Textos en español correcto (con sus tildes): si una palabra necesita una tecla que todavía no se enseñó, se elige otra palabra.
+- Cada intento = ejercicios fijos + uno generado al azar con `words` (o grupos de letras si hay menos de 4 palabras).
+- Reglas: aprobar con ≥ 90 % de precisión; estrellas 90/95/98 %; las PPM no condicionan. Infantil desbloquea en orden; adulto tiene todo abierto con la recomendada destacada.
+- El service worker guarda todas las lecciones leyendo cada `index.json`; al cambiar lecciones, subir `CACHE_VERSION`.
 
 ## Datos y perfiles
 
 - Todo se guarda en **una** clave de localStorage, `mecanografia`, como documento JSON con `version` (esquema documentado al principio de `js/storage.js`). Para cambiar la forma: subir `SCHEMA_VERSION` y agregar `MIGRATIONS[versiónVieja]`; nunca leer ni escribir localStorage fuera de `storage.js`.
 - El progreso va en `profile.progress[layoutId]`: un curso por distribución dentro del mismo perfil.
 - Respaldo: `{ app: "mecanografia", type: "backup", exportedAt, data }`. Importar valida, migra y reemplaza todo previa confirmación.
-- Pantallas: `#/` elegir perfil (y respaldo; mostrarla deja sin perfil activo), `#/perfiles/nuevo`, `#/perfiles/:id/editar`, `#/inicio` del perfil activo. Las pantallas que necesitan un perfil activo redirigen a `#/`.
+- Pantallas que cargan datos de forma asíncrona deben devolver una función de limpieza y descartar resultados que lleguen después de salir de la pantalla (si no, dibujan dentro de la pantalla siguiente).
+- Pantallas: `#/` elegir perfil (y respaldo; mostrarla deja sin perfil activo), `#/perfiles/nuevo`, `#/perfiles/:id/editar`, `#/inicio` del perfil activo, `#/lecciones` (mapa), `#/lecciones/:id`, `#/teclado-libre`. Las pantallas que necesitan un perfil activo redirigen a `#/`.
 - El modo (`data-mode` en `<html>`) y la distribución de la práctica salen del perfil activo.
 
 ## Pantalla de práctica

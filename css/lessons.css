@@ -1,0 +1,179 @@
+/* Lessons: course map tiles, keycaps, stars and the results screen. */
+
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-md);
+}
+
+.lesson-unit {
+  margin-top: var(--space-lg);
+}
+
+.lesson-unit h2 {
+  font-size: 1.25em;
+}
+
+.lesson-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--space-md);
+}
+
+.lesson-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  height: 100%;
+  padding: var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+a.lesson-tile:hover {
+  border-color: var(--color-accent);
+}
+
+.lesson-tile--locked {
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+.lesson-tile--completed {
+  border-color: var(--color-correct);
+}
+
+.lesson-tile--recommended {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent);
+}
+
+.lesson-tile__number {
+  font-size: 0.85em;
+  color: var(--color-text-muted);
+}
+
+.lesson-tile__title {
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+.lesson-tile__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.lesson-tile__status {
+  font-size: 0.85em;
+  color: var(--color-text-muted);
+}
+
+.lesson-tile--recommended .lesson-tile__status {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.keycaps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.keycaps kbd {
+  min-width: 1.8em;
+  padding: 0.1em 0.4em;
+  border: 1px solid var(--color-key-border);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  background: var(--color-key);
+  color: var(--color-key-text);
+  font: 600 1em ui-monospace, "Cascadia Mono", Consolas, monospace;
+  text-align: center;
+}
+
+.keycaps--review {
+  font-size: 0.85em;
+  color: var(--color-text-muted);
+}
+
+.stars {
+  display: inline-flex;
+  gap: 0.1em;
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.star {
+  color: var(--color-key-border);
+}
+
+.star--on {
+  color: var(--color-star);
+}
+
+.stars--large {
+  font-size: 3.2rem;
+}
+
+/* --- Results --- */
+
+.results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  border: 3px solid var(--color-border);
+  text-align: center;
+}
+
+.results--passed {
+  border-color: var(--color-correct);
+}
+
+.results h1,
+.results p {
+  margin: 0;
+}
+
+.results__lesson {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.results__stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-lg);
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.results__record {
+  color: var(--color-correct);
+  font-weight: 700;
+}
+
+.results__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}

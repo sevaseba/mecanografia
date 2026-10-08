@@ -1,0 +1,26 @@
+{
+  "id": "14-x-punto",
+  "title": "x y punto",
+  "newKeys": [
+    "x",
+    "."
+  ],
+  "exercises": [
+    "xxx ... xxx ... x. .x xx. ..x x.x .x.",
+    "xa e. xmx k.s xo r. xjx y.p",
+    "taxi. texto. sexto. extra. taxi.",
+    "el taxi es caro. leo el texto."
+  ],
+  "words": [
+    "taxi.",
+    "texto.",
+    "sexto.",
+    "extra.",
+    "taxi",
+    "texto",
+    "sexto",
+    "extra",
+    "caro.",
+    "leo."
+  ]
+}

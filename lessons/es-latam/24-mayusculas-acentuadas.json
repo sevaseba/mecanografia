@@ -1,0 +1,28 @@
+{
+  "id": "24-mayusculas-acentuadas",
+  "title": "Á, É, Í, Ó, Ú y Ü",
+  "newKeys": [
+    "Á",
+    "É",
+    "Í",
+    "Ó",
+    "Ú",
+    "Ü"
+  ],
+  "exercises": [
+    "Á É Í Ó Ú Ñ Á É Í Ó Ú Ñ",
+    "Él, Ángela y Óscar.",
+    "Ñandú es un ave de América.",
+    "Úrsula e Íñigo juegan."
+  ],
+  "words": [
+    "Él",
+    "Ángela",
+    "Óscar",
+    "Úrsula",
+    "Íñigo",
+    "Ñandú",
+    "Éxito",
+    "ÑOQUIS"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "20-exclamacion",
+  "title": "¡ y !",
+  "newKeys": [
+    "¡",
+    "!"
+  ],
+  "exercises": [
+    "¡! ¡! ¡! ¡! ¡!",
+    "¡Hola! ¡Bien! ¡Dale!",
+    "¡Hoy hace calor!",
+    "¡Ganamos el partido!"
+  ],
+  "words": [
+    "¡Hola!",
+    "¡Bien!",
+    "¡Dale!",
+    "¡Vamos!",
+    "¡Genial!",
+    "¡Chau!"
+  ]
+}

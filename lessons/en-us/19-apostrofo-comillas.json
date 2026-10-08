@@ -1,0 +1,26 @@
+{
+  "id": "19-apostrofo-comillas",
+  "title": "Apóstrofo y comillas",
+  "newKeys": [
+    "'",
+    "\""
+  ],
+  "exercises": [
+    "' ' \" \" '' \"\" ' \"",
+    "it's don't can't we'll I'm",
+    "\"Hi,\" said Sam.",
+    "Don't forget: it's Sam's dog."
+  ],
+  "words": [
+    "it's",
+    "don't",
+    "can't",
+    "we'll",
+    "I'm",
+    "Sam's",
+    "\"hi\"",
+    "\"yes\"",
+    "you're",
+    "isn't"
+  ]
+}

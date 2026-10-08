@@ -1,0 +1,21 @@
+{
+  "id": "18-dos-puntos",
+  "title": ":",
+  "newKeys": [
+    ":"
+  ],
+  "exercises": [
+    ": : : : : :",
+    "Note: one; two: three",
+    "Rule: be kind.",
+    "Time: ten to six."
+  ],
+  "words": [
+    "Note:",
+    "Rule:",
+    "Time:",
+    "Name:",
+    "Day:",
+    "Tip:"
+  ]
+}

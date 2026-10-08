@@ -106,11 +106,47 @@ export const strings = {
 
   home: {
     greeting: (name) => `¡Hola, ${name}!`,
+    lessons: 'Lecciones',
+    lessonsDescription: 'Aprendé paso a paso, de la fila guía a los números.',
+    continueWith: (number, title) => `Seguí con la lección ${number}: ${title}`,
+    courseDone: '¡Completaste todo el curso!',
     freeTyping: 'Teclado libre',
     freeTypingDescription: 'Escribí textos de prueba con la guía del teclado y las manos.',
-    lessonsSoon: 'Muy pronto: lecciones paso a paso.',
     switchProfile: 'Cambiar de perfil',
     editProfile: 'Editar mi perfil',
+  },
+
+  lessons: {
+    title: 'Lecciones',
+    back: 'Volver al inicio',
+    summary: (layoutName, done, total) => `Curso de ${layoutName}: ${done} de ${total} lecciones aprobadas`,
+    loading: 'Cargando lecciones…',
+    loadError: 'No se pudieron cargar las lecciones. Revisá la conexión y volvé a intentar.',
+    lessonNumber: (number) => `Lección ${number}`,
+    lessonTitle: (number, title) => `Lección ${number}: ${title}`,
+    newKeysLabel: 'Teclas nuevas',
+    review: 'Repaso',
+    status: {
+      locked: 'Bloqueada: primero aprobá la anterior',
+      available: 'Disponible',
+      completed: 'Aprobada',
+    },
+    recommended: 'Seguí acá',
+    stars: (count) => `${count} de 3 estrellas`,
+    exerciseCounter: (current, total) => `Ejercicio ${current} de ${total}`,
+    restartLesson: 'Empezar de nuevo',
+    passedTitle: '¡Lección aprobada!',
+    failedTitle: '¡Casi!',
+    passedMessage: (stars) =>
+      stars === 3 ? '¡Perfecta! Conseguiste las tres estrellas.' : 'Para más estrellas, buscá más precisión.',
+    failedMessage: (needed) => `Para aprobar necesitás ${needed} % de precisión. ¡Probá de nuevo, sin apuro!`,
+    newRecord: '¡Nuevo récord!',
+    accuracy: (value) => `Precisión: ${value} %`,
+    wpm: (value) => `Velocidad: ${value ?? '–'} PPM`,
+    nextLesson: 'Siguiente lección',
+    retry: 'Repetir',
+    backToMap: 'Ver todas las lecciones',
+    courseFinished: '¡Terminaste el curso!',
   },
 
   freeTyping: {

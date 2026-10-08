@@ -1,0 +1,28 @@
+{
+  "id": "14-x-punto",
+  "title": "x y punto",
+  "newKeys": [
+    "x",
+    "."
+  ],
+  "exercises": [
+    "xxx ... xxx ... x. .x xx. ..x x.x .x.",
+    "xa e. xmx k.s xo r. xkx y.q",
+    "fox. tax. six. mix. exit. extra.",
+    "the fox is six. mix it."
+  ],
+  "words": [
+    "fox.",
+    "tax.",
+    "six.",
+    "mix.",
+    "exit.",
+    "extra.",
+    "fox",
+    "tax",
+    "six",
+    "mix",
+    "exit",
+    "extra"
+  ]
+}

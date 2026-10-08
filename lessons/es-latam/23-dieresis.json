@@ -1,0 +1,21 @@
+{
+  "id": "23-dieresis",
+  "title": "ü",
+  "newKeys": [
+    "ü"
+  ],
+  "exercises": [
+    "ü ü ü ü ü ü",
+    "pingüino cigüeña agüita",
+    "El pingüino toma agüita.",
+    "Una cigüeña y un pingüino."
+  ],
+  "words": [
+    "pingüino",
+    "cigüeña",
+    "agüita",
+    "güero",
+    "paragüitas",
+    "bilingüe"
+  ]
+}

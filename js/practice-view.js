@@ -33,8 +33,9 @@ const MISS_SIGNAL_MS = 400;
  * @param {object[]} options.keyIndexes   all key indexes, to detect the OS layout
  * @param {Node[]} [options.tools]        screen-specific controls for the stats bar
  * @param {(layoutId: string) => void} [options.onLayoutSuggestion]  "use this layout" button
+ * @param {(session: object) => void} [options.onFinish]  the current text was completed
  */
-export function createPracticeView({ title, keyIndex, keyIndexes, tools = [], onLayoutSuggestion }) {
+export function createPracticeView({ title, keyIndex, keyIndexes, tools = [], onLayoutSuggestion, onFinish }) {
   const state = {
     keyIndex,
     session: createTypingSession(''),
@@ -135,7 +136,10 @@ export function createPracticeView({ title, keyIndex, keyIndexes, tools = [], on
         if (!correct && !advanceOnError) signalMiss();
       }
       render();
-      if (!wasDone && state.session.done) announce(`${text.finished} ${text.finishedStats(computeStats(state.session))}`);
+      if (!wasDone && state.session.done) {
+        announce(`${text.finished} ${text.finishedStats(computeStats(state.session))}`);
+        onFinish?.(state.session);
+      }
     },
     onBackspace: () => {
       state.session.backspace();

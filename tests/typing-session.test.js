@@ -31,3 +31,22 @@ test('finishes only when the last character is right in kids mode', () => {
   session.type('a', { advanceOnError: false });
   assert.equal(session.done, true);
 });
+
+test('combined stats add up several exercises, ignoring the pauses between them', async () => {
+  const { combineStats } = await import('../js/stats.js');
+  let clock = 0;
+  const now = () => clock;
+  const first = createTypingSession('ab', { now });
+  first.type('a');
+  clock = 6000;
+  first.type('x'); // wrong, 6 s
+  clock = 100000; // a long pause before the next exercise
+  const second = createTypingSession('cd', { now });
+  second.type('c');
+  clock = 106000;
+  second.type('d'); // 6 s
+  const stats = combineStats([first, second]);
+  assert.equal(stats.accuracy, 75); // 3 of 4 keystrokes right
+  assert.equal(stats.durationMs, 12000);
+  assert.equal(stats.wpm, 3); // 3 correct chars / 5 / 0.2 min
+});

@@ -1,0 +1,26 @@
+{
+  "id": "21-a-e-acento",
+  "title": "á y é",
+  "newKeys": [
+    "á",
+    "é"
+  ],
+  "exercises": [
+    "á é á é á é á é",
+    "mamá papá café está bebé",
+    "Mamá está en el café.",
+    "El bebé ya está acá."
+  ],
+  "words": [
+    "mamá",
+    "papá",
+    "café",
+    "está",
+    "bebé",
+    "acá",
+    "allá",
+    "sofá",
+    "José",
+    "Andrés"
+  ]
+}

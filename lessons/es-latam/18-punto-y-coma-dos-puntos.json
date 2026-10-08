@@ -1,0 +1,22 @@
+{
+  "id": "18-punto-y-coma-dos-puntos",
+  "title": "; y :",
+  "newKeys": [
+    ";",
+    ":"
+  ],
+  "exercises": [
+    "; ; : : ;: :; ; :",
+    "Hola: vamos al parque; hace sol.",
+    "Tengo dos gatos: Toto y Mora.",
+    "Es tarde; mejor volvemos."
+  ],
+  "words": [
+    "hola:",
+    "si;",
+    "dos:",
+    "sol;",
+    "casa:",
+    "luz;"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "20-pregunta-exclamacion",
+  "title": "? y !",
+  "newKeys": [
+    "?",
+    "!"
+  ],
+  "exercises": [
+    "? ? ! ! ?! !? ? !",
+    "Why? Now? Yes! Go!",
+    "Are you ready? Let's go!",
+    "What a great day!"
+  ],
+  "words": [
+    "Why?",
+    "Now?",
+    "Yes!",
+    "Go!",
+    "Who?",
+    "Wow!",
+    "Ready?",
+    "Great!"
+  ]
+}

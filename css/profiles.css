@@ -372,6 +372,17 @@ input[aria-invalid="true"] {
   background: var(--color-accent-hover);
 }
 
+.home-action--secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+}
+
+.home-action--secondary:hover {
+  background: var(--color-surface);
+  border-color: var(--color-accent);
+}
+
 .home-action__title {
   font-size: 1.5em;
   font-weight: 700;
