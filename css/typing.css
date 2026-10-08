@@ -1,0 +1,94 @@
+/* Practice area: target text with per-character feedback. */
+
+.practice {
+  position: relative;
+  padding: var(--space-lg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: text;
+}
+
+.practice:focus-within {
+  border-color: var(--color-accent);
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* Kept in the DOM and focusable, but invisible: it only receives keystrokes. */
+.practice__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  resize: none;
+  border: 0;
+  padding: 0;
+  cursor: text;
+}
+
+.practice__text {
+  margin: 0;
+  max-width: none;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+  font-size: 1.45rem;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.practice__prompt {
+  margin: var(--space-md) 0 0;
+}
+
+.practice:focus-within .practice__prompt {
+  visibility: hidden;
+}
+
+.char {
+  border-radius: 3px;
+}
+
+.char--correct {
+  color: var(--color-correct);
+}
+
+/* Wrong: color + background + wavy underline, so it does not rely on color alone. */
+.char--wrong {
+  color: var(--color-wrong-text);
+  background: var(--color-wrong-bg);
+  text-decoration: underline wavy var(--color-wrong-text);
+  text-underline-offset: 0.2em;
+}
+
+.char--current {
+  box-shadow: inset 0 -0.18em 0 var(--color-accent);
+}
+
+.practice:focus-within .char--current {
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% { box-shadow: none; }
+}
+
+.hint {
+  margin: var(--space-md) 0 var(--space-sm);
+  font-size: 1.1em;
+  font-weight: 600;
+  max-width: none;
+}
+
+.practice-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.practice-footer p {
+  margin: 0;
+}

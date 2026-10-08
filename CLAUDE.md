@@ -25,7 +25,7 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 ├── index.html            # única página; las pantallas se montan desde JS
 ├── manifest.webmanifest
 ├── sw.js                 # service worker (debe estar en la raíz por el scope)
-├── css/                  # estilos: base, temas (infantil/adulto), componentes
+├── css/                  # base.css, themes.css (tokens por modo) y un archivo por componente
 ├── js/
 │   ├── app.js            # punto de entrada: arranque y registro del service worker
 │   ├── router.js         # navegación por hash (#/...) y montaje de pantallas
@@ -36,6 +36,7 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │   ├── storage.js        # acceso a localStorage (perfiles y progreso)
 │   ├── profiles.js       # alta/baja/edición de perfiles
 │   ├── input.js          # captura de teclado, teclas muertas, composición
+│   ├── keystrokes.js     # carácter ↔ secuencia de teclas físicas según la distribución
 │   ├── layout-check.js   # detección de distribución del SO vs. la elegida
 │   ├── typing-session.js # motor de ejercicio: texto objetivo, errores, avance
 │   ├── stats.js          # PPM, precisión, historial
@@ -62,7 +63,9 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 - Módulos ES nativos (`import`/`export`), sin variables globales.
 - Los textos de la interfaz se centralizan (por ejemplo `js/strings.js`) para mantener consistencia del voseo.
 - CSS con custom properties para los temas; nada de estilos inline desde JS salvo valores dinámicos.
-- Para identificar teclas físicas se usa `KeyboardEvent.code`; para el carácter producido, `KeyboardEvent.key` (ver `input.js`).
+- Para identificar teclas físicas se usa `KeyboardEvent.code`. El carácter producido se toma de los eventos `input`/`compositionend` de un textarea oculto (no de `keydown`), porque ahí el sistema ya compuso las teclas muertas (´ + a → á). Ver `input.js`.
+- El formato de los archivos de distribución está documentado al principio de `js/layouts/es-latam.js`.
+- `navigator.keyboard.getLayoutMap()` (solo Chromium) devuelve únicamente la capa base, y las teclas muertas como su carácter de espaciado (`BracketLeft` → `´` en es-latam), nunca `"Dead"`. Verificado en Chrome 153 / Windows.
 - Cuando se agrega o renombra un archivo de la app, actualizar la lista de precache en `sw.js` y subir su versión de caché.
 
 ## Regla de verificación

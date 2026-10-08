@@ -4,10 +4,12 @@ import { startRouter } from './router.js';
 import { announce } from './announcer.js';
 import { strings } from './strings.js';
 import * as homeScreen from './screens/home.js';
+import * as freeTypingScreen from './screens/free-typing.js';
 import * as notFoundScreen from './screens/not-found.js';
 
 const routes = {
   '/': homeScreen,
+  '/teclado-libre': freeTypingScreen,
 };
 
 startRouter(document.getElementById('app'), routes, notFoundScreen);

@@ -1,0 +1,125 @@
+/* On-screen keyboard. Sizes scale with the root font size (bigger in kids mode). */
+
+.keyboard {
+  --unit: min(2.9rem, calc((100vw - 3rem) / 16));
+  --gap: calc(var(--unit) * 0.1);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  width: max-content;
+  max-width: 100%;
+  margin: var(--space-lg) auto var(--space-md);
+  padding: var(--gap);
+  border-radius: var(--radius);
+  background: var(--color-border);
+  user-select: none;
+}
+
+.keyboard__row {
+  display: flex;
+  gap: var(--gap);
+}
+
+.key {
+  position: relative;
+  flex: none;
+  width: calc(var(--w) * var(--unit) + (var(--w) - 1) * var(--gap));
+  height: var(--unit);
+  border: 1px solid var(--color-key-border);
+  border-radius: calc(var(--unit) * 0.15);
+  background: var(--color-key);
+  color: var(--color-key-text);
+  font-size: calc(var(--unit) * 0.34);
+  line-height: 1;
+  transition: transform 80ms ease-out, background-color 80ms;
+}
+
+.key--spacer {
+  visibility: hidden;
+}
+
+.key[data-finger-group="5"] { background: var(--finger-5); }
+.key[data-finger-group="4"] { background: var(--finger-4); }
+.key[data-finger-group="3"] { background: var(--finger-3); }
+.key[data-finger-group="2"] { background: var(--finger-2); }
+.key[data-finger-group="thumb"] { background: var(--finger-thumb); }
+
+.key__label {
+  position: absolute;
+}
+
+.key__label--letter {
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.35em;
+  font-weight: 600;
+}
+
+.key__label--shift { top: 12%; left: 14%; }
+.key__label--base { bottom: 12%; left: 14%; font-size: 1.15em; }
+.key__label--altgr { bottom: 12%; right: 14%; opacity: 0.8; }
+
+.key--modifier .key__label {
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.8em;
+  padding: 0 0.3em;
+  text-align: center;
+}
+
+.key--pressed {
+  transform: translateY(2px);
+  filter: brightness(0.85);
+}
+
+.key--next {
+  background: var(--color-accent) !important;
+  color: var(--color-on-accent);
+  box-shadow: 0 0 0 3px var(--color-focus);
+  z-index: 1;
+  animation: key-pulse 1.2s ease-in-out infinite;
+}
+
+.key--next-modifier {
+  background: var(--color-accent) !important;
+  color: var(--color-on-accent);
+  outline: 3px dashed var(--color-focus);
+  outline-offset: 2px;
+}
+
+@keyframes key-pulse {
+  50% { box-shadow: 0 0 0 6px var(--color-focus); }
+}
+
+.finger-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm) var(--space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.finger-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.finger-legend__swatch {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  border-radius: 4px;
+  border: 1px solid var(--color-key-border);
+}
+
+.finger-legend__swatch[data-finger-group="5"] { background: var(--finger-5); }
+.finger-legend__swatch[data-finger-group="4"] { background: var(--finger-4); }
+.finger-legend__swatch[data-finger-group="3"] { background: var(--finger-3); }
+.finger-legend__swatch[data-finger-group="2"] { background: var(--finger-2); }
+.finger-legend__swatch[data-finger-group="thumb"] { background: var(--finger-thumb); }
