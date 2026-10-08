@@ -68,6 +68,7 @@ Teclado libre y lecciones usan `practice-view.js`. Reglas de diseño:
 - Una sola línea de texto que se desplaza; lo escrito se desvanece a la izquierda.
 - La guía es gráfica: tecla y dedo en el color saturado de su dedo, con contorno y pulso. Mayús/Alt Gr: se iluminan los dos dedos. Tecla muerta: globitos 1 y 2. El texto del dedo es complementario y se oculta en modo infantil.
 - Modo infantil: tarjeta grande con el carácter actual a la izquierda de la línea; la franja solo muestra el progreso. Utilidades `.only-adult` / `.only-kids`.
+- Errores: en modo infantil la práctica no avanza hasta la tecla correcta (la tarjeta se sacude en rojo); en modo adulto avanza y el error queda marcado. Debajo de cada error se muestra lo que se escribió (`v` bajo `V`). La tecla presionada destella verde o roja en el teclado. El desvanecido de lo escrito es corto: las últimas ~10 letras se ven nítidas.
 
 ## Convenciones de código
 

@@ -71,6 +71,18 @@
   filter: brightness(0.85);
 }
 
+/* Result of the key just pressed: green if it produced the right character, red if not. */
+.key--hit {
+  outline: 4px solid var(--color-correct);
+  outline-offset: 2px;
+}
+
+.key--miss {
+  outline: 4px solid var(--color-wrong-text);
+  outline-offset: 2px;
+  background: var(--color-wrong-bg) !important;
+}
+
 /* --- Guidance: key to press now (and keys held with it) light up in the finger color. --- */
 
 .key:is([data-role="primary"], [data-role="modifier"]) {

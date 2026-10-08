@@ -6,6 +6,7 @@ import { strings } from './strings.js';
 import { ROLE_RANK } from './guidance.js';
 
 const PRESS_FLASH_MS = 160;
+const RESULT_FLASH_MS = 350;
 
 export function createKeyboardView(layout) {
   const element = el('div', { class: 'keyboard', 'aria-hidden': 'true' });
@@ -50,8 +51,18 @@ export function createKeyboardView(layout) {
     setTimeout(() => keyElement.classList.remove('key--pressed'), PRESS_FLASH_MS);
   }
 
+  /** Flashes the key that produced a character green (right) or red (wrong). */
+  function flashResult(code, correct) {
+    const keyElement = keyElements.get(code);
+    if (!keyElement) return;
+    const className = correct ? 'key--hit' : 'key--miss';
+    keyElement.classList.remove('key--hit', 'key--miss');
+    keyElement.classList.add(className);
+    setTimeout(() => keyElement.classList.remove(className), RESULT_FLASH_MS);
+  }
+
   render(layout);
-  return { element, setLayout: render, show, flash };
+  return { element, setLayout: render, show, flash, flashResult };
 }
 
 function renderKey(key) {

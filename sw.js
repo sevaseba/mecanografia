@@ -1,7 +1,7 @@
 // Service worker: precaches the whole app so it works offline.
 // Bump CACHE_VERSION whenever any precached file changes, and add new files to PRECACHE.
 
-const CACHE_VERSION = 'v10';
+const CACHE_VERSION = 'v12';
 const CACHE_NAME = `mecanografia-${CACHE_VERSION}`;
 
 const PRECACHE = [

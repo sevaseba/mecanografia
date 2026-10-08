@@ -29,3 +29,13 @@ Probado en Chrome dentro de un iframe de 1366×641 (la pantalla real tiene escal
 Errores encontrados y corregidos durante la prueba: el escenario medía 0 px de alto cuando el aviso estaba oculto (grilla → flex); la mano derecha estaba corrida una tecla (J está a 3 teclas de F, no 4); los selectores de teclado libre leían `.value` del objeto equivocado (el modo quedaba en "undefined").
 
 No verificado: `prefers-reduced-motion` (no se puede emular desde la página; lo cubre la regla global de `base.css`) y la prueba con el teclado físico real, pendiente desde la etapa 2.
+
+## Ajuste: feedback de aciertos y errores (reporte "siempre se marca rojo")
+
+Diagnóstico con el registro de eventos del teclado real (Chrome, Windows, Latinoamericano): la detección era correcta; los 6 rojos eran errores reales (`v` sin Mayús, `a` por `e`, `ñ` por `l`, `´`+`i` por `p`, `n` por `i`, `´`+`u` = `ú` por `ü`) y los 13 aciertos estaban en verde. Confirma además que las teclas muertas reales llegan como `keydown "Dead"` + `input` con la letra compuesta.
+
+- [x] Desvanecido de lo escrito acotado al 12 % izquierdo (las últimas ~10 letras quedan nítidas)
+- [x] Debajo de cada error, lo que se escribió (reemplaza al subrayado ondulado como señal que no depende del color)
+- [x] La tecla presionada destella verde (acierto) o roja (error) en el teclado en pantalla
+- [x] Modo infantil: no avanza en el error (`type(char, { advanceOnError: false })`); la tarjeta se sacude en rojo. Modo adulto: avanza como antes
+- [x] Pruebas de `typing-session` (node:test, 3/3), repetición de la sesión real del usuario en 1366×641, modo infantil sin avance en el error, consola sin errores

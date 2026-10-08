@@ -24,6 +24,7 @@ const text = strings.practice;
 const UPCOMING_CHARS = 3;
 const STATS_REFRESH_MS = 1000;
 const VISIBLE_SPACE = '␣';
+const MISS_SIGNAL_MS = 400;
 
 /**
  * @param {object} options
@@ -114,14 +115,25 @@ export function createPracticeView({ title, keyIndex, keyIndexes, tools = [], on
     if (!wasWarning && isWarning()) announce(layoutBanner.textContent);
   });
 
+  // Physical key that produced the latest text, to flash it green or red.
+  let lastCharKeyCode = null;
+
   const input = attachKeyboardInput(textarea, {
     onKey: (key) => {
       keyboard.flash(key.code);
       inference.observe(key);
+      if (key.key === 'Dead' || [...key.key].length === 1) lastCharKeyCode = key.code;
     },
     onText: (chars) => {
       const wasDone = state.session.done;
-      for (const char of chars) state.session.type(char);
+      // Kids mode waits on the expected character; adult mode moves on and marks the error.
+      const advanceOnError = document.documentElement.dataset.mode !== 'kids';
+      for (const char of chars) {
+        const correct = state.session.type(char, { advanceOnError });
+        if (correct === null) continue;
+        keyboard.flashResult(lastCharKeyCode, correct);
+        if (!correct && !advanceOnError) signalMiss();
+      }
       render();
       if (!wasDone && state.session.done) announce(`${text.finished} ${text.finishedStats(computeStats(state.session))}`);
     },
@@ -167,6 +179,15 @@ export function createPracticeView({ title, keyIndex, keyIndexes, tools = [], on
     clearInterval(statsTimer);
     input.detach();
     textLine.destroy();
+  }
+
+  let missTimer = null;
+  function signalMiss() {
+    focusRow.classList.remove('is-miss');
+    void focusRow.offsetWidth; // restart the animation on repeated misses
+    focusRow.classList.add('is-miss');
+    clearTimeout(missTimer);
+    missTimer = setTimeout(() => focusRow.classList.remove('is-miss'), MISS_SIGNAL_MS);
   }
 
   // --- Rendering ---

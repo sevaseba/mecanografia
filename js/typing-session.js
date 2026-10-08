@@ -33,14 +33,19 @@ export function createTypingSession(text, { now = () => Date.now() } = {}) {
     get finishedAt() {
       return finishedAt;
     },
-    /** Registers one typed character. Returns whether it was correct, or null if finished. */
-    type(char) {
+    /**
+     * Registers one typed character. Returns whether it was correct, or null if finished.
+     * With advanceOnError false, a wrong character counts as a mistake but the position
+     * stays on the expected character until it is typed right.
+     */
+    type(char, { advanceOnError = true } = {}) {
       if (typed.length >= target.length) return null;
       startedAt ??= now();
       const normalized = char.normalize('NFC');
       const correct = normalized === target[typed.length];
       keystrokes += 1;
       if (!correct) mistakes += 1;
+      if (!correct && !advanceOnError) return false;
       typed.push({ char: normalized, correct });
       if (typed.length === target.length) finishedAt = now();
       return correct;

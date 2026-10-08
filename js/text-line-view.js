@@ -23,6 +23,9 @@ export function createTextLineView() {
       span.classList.toggle('char--correct', entry?.correct === true);
       span.classList.toggle('char--wrong', entry?.correct === false);
       span.classList.toggle('char--current', position === session.position);
+      // Under a wrong character, show what was actually typed (v under V, ú under ü).
+      if (entry?.correct === false) span.dataset.typed = entry.char === ' ' ? '␣' : entry.char;
+      else delete span.dataset.typed;
     });
     recenter(session.position);
   }
