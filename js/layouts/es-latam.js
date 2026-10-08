@@ -4,7 +4,8 @@
 // - id, name: identifier and user-facing name. language: ISO code of the course language.
 // - rows: physical rows, top to bottom. Each key:
 //     code     KeyboardEvent.code of the physical key
-//     finger   L5..L2 / R2..R5 (pinky..index) or 'T' (thumb); omitted on non-typing modifiers
+//     finger   L5..L1 / R1..R5 (pinky..thumb), or 'T' for either thumb (Space);
+//              omitted on keys that are not part of touch typing (Ctrl, Win, …)
 //     width    in key units (default 1)
 //     base, shift, altGr   character produced on each layer (omit if none)
 //     dead     layers whose character is a dead key, e.g. ['base', 'shift']
@@ -87,7 +88,7 @@ export default {
       { code: 'MetaLeft', width: 1.25 },
       { code: 'AltLeft', width: 1.25 },
       { code: 'Space', finger: 'T', width: 6.25 },
-      { code: 'AltRight', finger: 'T', altGraph: true, width: 1.25 },
+      { code: 'AltRight', finger: 'R1', altGraph: true, width: 1.25 },
       { code: 'MetaRight', width: 1.25 },
       { code: 'ContextMenu', width: 1.25 },
       { code: 'ControlRight', width: 1.25 },

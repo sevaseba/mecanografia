@@ -38,9 +38,13 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │   ├── input.js          # captura de teclado, teclas muertas, composición
 │   ├── keystrokes.js     # carácter ↔ secuencia de teclas físicas según la distribución
 │   ├── layout-check.js   # detección de distribución del SO vs. la elegida
-│   ├── typing-session.js # motor de ejercicio: texto objetivo, errores, avance
-│   ├── stats.js          # PPM, precisión, historial
-│   ├── keyboard-view.js  # teclado en pantalla con dedos y resaltado
+│   ├── typing-session.js # estado del ejercicio: texto objetivo, errores, tiempos
+│   ├── stats.js          # PPM y precisión
+│   ├── guidance.js       # qué teclas y dedos iluminar para el próximo carácter
+│   ├── practice-view.js  # pantalla de práctica (teclado libre y lecciones)
+│   ├── text-line-view.js # línea única de texto que se desplaza
+│   ├── keyboard-view.js  # teclado en pantalla con colores por dedo
+│   ├── hands-view.js     # manos en SVG (pictograma) con el dedo a usar iluminado
 │   └── layouts/
 │       ├── index.js      # registro de distribuciones disponibles
 │       ├── es-latam.js
@@ -55,6 +59,15 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 ├── icons/                # íconos de la PWA (192, 512, maskable)
 └── assets/               # sonidos, ilustraciones, fuentes
 ```
+
+## Pantalla de práctica
+
+Teclado libre y lecciones usan `practice-view.js`. Reglas de diseño:
+- Todo entra en un viewport sin scroll; referencia mínima: notebook de 1366×768 (≈ 1366×641 útiles en Chrome). El tamaño de tecla sale del menor entre ancho y alto disponibles (container query units en `.practice-stage`).
+- Orden vertical: franja fina de estadísticas → (aviso de distribución) → línea de texto → teclado → manos → texto corto del dedo. Nada entre la línea de texto y el teclado.
+- Una sola línea de texto que se desplaza; lo escrito se desvanece a la izquierda.
+- La guía es gráfica: tecla y dedo en el color saturado de su dedo, con contorno y pulso. Mayús/Alt Gr: se iluminan los dos dedos. Tecla muerta: globitos 1 y 2. El texto del dedo es complementario y se oculta en modo infantil.
+- Modo infantil: tarjeta grande con el carácter actual a la izquierda de la línea; la franja solo muestra el progreso. Utilidades `.only-adult` / `.only-kids`.
 
 ## Convenciones de código
 

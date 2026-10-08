@@ -1,7 +1,7 @@
 // Service worker: precaches the whole app so it works offline.
 // Bump CACHE_VERSION whenever any precached file changes, and add new files to PRECACHE.
 
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v10';
 const CACHE_NAME = `mecanografia-${CACHE_VERSION}`;
 
 const PRECACHE = [
@@ -11,16 +11,21 @@ const PRECACHE = [
   './css/base.css',
   './css/themes.css',
   './css/keyboard.css',
-  './css/typing.css',
+  './css/practice.css',
   './js/app.js',
   './js/announcer.js',
   './js/dom.js',
+  './js/guidance.js',
+  './js/hands-view.js',
   './js/input.js',
   './js/keyboard-view.js',
   './js/keystrokes.js',
   './js/layout-check.js',
+  './js/practice-view.js',
   './js/router.js',
+  './js/stats.js',
   './js/strings.js',
+  './js/text-line-view.js',
   './js/typing-session.js',
   './js/layouts/index.js',
   './js/layouts/es-latam.js',

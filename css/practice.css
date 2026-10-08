@@ -1,0 +1,338 @@
+/* Practice screen: one viewport, no scroll. Sizes derive from the stage's own size
+   (container query units), so the keyboard shrinks to fit both width and height. */
+
+main:has(> .practice-screen) {
+  max-width: none;
+  padding: 0;
+}
+
+.practice-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* --- Stats bar (thin, fixed font size in both modes) --- */
+
+.practice-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 6px 16px;
+  font-size: 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.practice-bar__back {
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+
+.practice-bar__title {
+  margin: 0;
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.stats {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 0;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.stat dt {
+  color: var(--color-text-muted);
+}
+
+.stat dd {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat__bar {
+  width: 9rem;
+  height: 10px;
+  accent-color: var(--color-accent);
+}
+
+.practice-bar__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tool {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+.tool label {
+  color: var(--color-text-muted);
+}
+
+.tool select {
+  padding: 2px 4px;
+  border-width: 1px;
+}
+
+.button--small {
+  padding: 3px 12px;
+}
+
+/* --- Layout warning --- */
+
+.layout-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 6px 16px;
+  font-size: 16px;
+  background: var(--color-warning-bg);
+  border-bottom: 2px solid var(--color-warning-border);
+}
+
+.layout-banner[hidden] {
+  display: none;
+}
+
+.layout-banner p {
+  margin: 0;
+  max-width: none;
+}
+
+.layout-banner .button {
+  padding: 3px 12px;
+  white-space: nowrap;
+}
+
+/* --- Stage --- */
+
+.practice-stage {
+  /* Size containment: the stage must get its height from the flex layout, never from content. */
+  container-type: size;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--stage-gap);
+
+  --stage-gap: 12px;
+  --line-h: 4.5rem;
+  --hands-h: 7.5rem;
+  --cue-h: 1.5rem;
+  /* Keyboard is 16.6 units wide and 5.6 units tall (keys + gaps + padding). */
+  --unit: min(
+    calc((100cqw - 32px) / 16.6),
+    calc((100cqh - var(--line-h) - var(--hands-h) - var(--cue-h) - 5 * var(--stage-gap)) / 5.6)
+  );
+  --gap: calc(var(--unit) * 0.1);
+  --board-w: calc(16.6 * var(--unit));
+  --hand-w: calc(var(--hands-h) * 200 / 210);
+}
+
+[data-mode="kids"] .practice-stage {
+  --line-h: 5rem;
+  --hands-h: 5rem;
+  --cue-h: 0px;
+}
+
+/* Text line (+ kids card): directly above the keyboard, same width. */
+.practice-focus {
+  position: relative;
+  flex: none;
+  display: flex;
+  gap: var(--stage-gap);
+  width: var(--board-w);
+  height: var(--line-h);
+}
+
+.practice-input {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  resize: none;
+  border: 0;
+  padding: 0;
+  cursor: text;
+}
+
+.text-line {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+/* Typed text fades out towards the left edge. */
+.text-line::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to right, var(--color-surface) 2%, transparent 36%);
+}
+
+.practice-stage:focus-within .text-line {
+  border-color: var(--color-accent);
+}
+
+.text-line__track {
+  flex: none;
+  white-space: pre;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+  font-size: calc(var(--line-h) * 0.5);
+  line-height: 1.3;
+  transition: transform 120ms ease-out;
+}
+
+[data-mode="kids"] .text-line__track {
+  font-size: calc(var(--line-h) * 0.42);
+}
+
+.char {
+  border-radius: 4px;
+}
+
+.char--correct {
+  color: var(--color-correct);
+}
+
+/* Wrong: color + background + wavy underline, so it does not rely on color alone. */
+.char--wrong {
+  color: var(--color-wrong-text);
+  background: var(--color-wrong-bg);
+  text-decoration: underline wavy var(--color-wrong-text);
+  text-underline-offset: 0.2em;
+}
+
+.char--current {
+  background: var(--color-current-bg);
+  box-shadow: inset 0 -0.12em 0 var(--color-accent);
+}
+
+.practice-stage:focus-within .char--current {
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% { box-shadow: none; }
+}
+
+/* Kids: big card with the current character and the next few. */
+.char-card {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0 0.6em;
+  border: 3px solid var(--color-accent);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.char-card__current {
+  min-width: 1.2em;
+  text-align: center;
+  font-size: calc(var(--line-h) * 0.8);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-heading);
+}
+
+.char-card__upcoming {
+  font-size: calc(var(--line-h) * 0.3);
+  color: var(--color-text-muted);
+  white-space: pre;
+}
+
+.practice-prompt {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 0.3em 1em;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 600;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.practice-stage:not(:focus-within) .practice-prompt {
+  display: block;
+}
+
+.practice-finish {
+  display: none;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+  border: 2px solid var(--color-correct);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.practice-finish p {
+  margin: 0;
+}
+
+.practice-finish__title {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: var(--color-correct);
+}
+
+.is-done .practice-finish {
+  display: flex;
+}
+
+.is-done .text-line,
+.is-done .char-card,
+.is-done .practice-prompt {
+  display: none;
+}
+
+.finger-cue {
+  flex: none;
+  height: var(--cue-h);
+  margin: calc(var(--stage-gap) * -0.5) 0 0;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: var(--cue-h);
+}

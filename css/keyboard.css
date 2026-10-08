@@ -1,17 +1,13 @@
-/* On-screen keyboard. Sizes scale with the root font size (bigger in kids mode). */
+/* On-screen keyboard and hands. Sizes come from --unit / --gap / --hands-h, set by the
+   practice stage (practice.css). */
 
 .keyboard {
-  --unit: min(2.9rem, calc((100vw - 3rem) / 16));
-  --gap: calc(var(--unit) * 0.1);
-
+  flex: none;
   display: flex;
   flex-direction: column;
   gap: var(--gap);
-  width: max-content;
-  max-width: 100%;
-  margin: var(--space-lg) auto var(--space-md);
   padding: var(--gap);
-  border-radius: var(--radius);
+  border-radius: calc(var(--unit) * 0.2);
   background: var(--color-border);
   user-select: none;
 }
@@ -75,51 +71,119 @@
   filter: brightness(0.85);
 }
 
-.key--next {
-  background: var(--color-accent) !important;
-  color: var(--color-on-accent);
-  box-shadow: 0 0 0 3px var(--color-focus);
+/* --- Guidance: key to press now (and keys held with it) light up in the finger color. --- */
+
+.key:is([data-role="primary"], [data-role="modifier"]) {
   z-index: 1;
-  animation: key-pulse 1.2s ease-in-out infinite;
+  color: var(--finger-on-strong);
+  box-shadow: 0 0 0 3px var(--color-text);
+  animation: key-pulse 1.1s ease-in-out infinite;
 }
 
-.key--next-modifier {
-  background: var(--color-accent) !important;
-  color: var(--color-on-accent);
-  outline: 3px dashed var(--color-focus);
-  outline-offset: 2px;
+.key:is([data-role="primary"], [data-role="modifier"])[data-finger-group="5"] { background: var(--finger-5-strong); }
+.key:is([data-role="primary"], [data-role="modifier"])[data-finger-group="4"] { background: var(--finger-4-strong); }
+.key:is([data-role="primary"], [data-role="modifier"])[data-finger-group="3"] { background: var(--finger-3-strong); }
+.key:is([data-role="primary"], [data-role="modifier"])[data-finger-group="2"] { background: var(--finger-2-strong); }
+.key:is([data-role="primary"], [data-role="modifier"])[data-finger-group="thumb"] { background: var(--finger-thumb-strong); }
+
+/* Key to press right after (the letter following a dead key). */
+.key[data-role="secondary"] {
+  z-index: 1;
+  outline: 3px dashed var(--color-text);
+  outline-offset: 1px;
+}
+
+.key__badge {
+  position: absolute;
+  top: -0.55em;
+  right: -0.45em;
+  display: grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: 0.85em;
+  font-weight: 700;
 }
 
 @keyframes key-pulse {
-  50% { box-shadow: 0 0 0 6px var(--color-focus); }
+  50% { transform: scale(1.08); }
 }
 
-.finger-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-sm) var(--space-md);
-  list-style: none;
-  margin: 0;
-  padding: 0;
+/* --- Hands: index fingers sit under F and J. --- */
+
+.hands {
+  position: relative;
+  flex: none;
+  width: var(--board-w);
+  height: var(--hands-h);
 }
 
-.finger-legend li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
+.hand {
+  position: absolute;
+  top: 0;
+  width: var(--hand-w);
+  height: 100%;
+  overflow: visible;
 }
 
-.finger-legend__swatch {
-  display: inline-block;
-  width: 1.1em;
-  height: 1.1em;
-  border-radius: 4px;
-  border: 1px solid var(--color-key-border);
+/* F center = 5.825 units from the keyboard edge, J = 3 keys further (9.125); index tips
+   are at 72 % / 28 % of the hand width. */
+.hand--left { left: calc(5.825 * var(--unit) - 0.72 * var(--hand-w)); }
+.hand--right { left: calc(9.125 * var(--unit) - 0.28 * var(--hand-w)); }
+
+.hand__palm {
+  fill: var(--color-key);
+  stroke: var(--color-key-border);
+  stroke-width: 2;
 }
 
-.finger-legend__swatch[data-finger-group="5"] { background: var(--finger-5); }
-.finger-legend__swatch[data-finger-group="4"] { background: var(--finger-4); }
-.finger-legend__swatch[data-finger-group="3"] { background: var(--finger-3); }
-.finger-legend__swatch[data-finger-group="2"] { background: var(--finger-2); }
-.finger-legend__swatch[data-finger-group="thumb"] { background: var(--finger-thumb); }
+.hand__finger {
+  stroke: var(--color-key-border);
+  stroke-width: 2;
+  transition: opacity 120ms, fill 120ms;
+}
+
+.hand__finger[data-finger-group="5"] { fill: var(--finger-5); }
+.hand__finger[data-finger-group="4"] { fill: var(--finger-4); }
+.hand__finger[data-finger-group="3"] { fill: var(--finger-3); }
+.hand__finger[data-finger-group="2"] { fill: var(--finger-2); }
+.hand__finger[data-finger-group="thumb"] { fill: var(--finger-thumb); }
+
+.hands--guiding .hand__finger:not([data-role]) {
+  opacity: 0.45;
+}
+
+.hand__finger:is([data-role="primary"], [data-role="modifier"]) {
+  stroke: var(--color-text);
+  stroke-width: 4;
+  animation: finger-pulse 1.1s ease-in-out infinite;
+}
+
+.hand__finger:is([data-role="primary"], [data-role="modifier"])[data-finger-group="5"] { fill: var(--finger-5-strong); }
+.hand__finger:is([data-role="primary"], [data-role="modifier"])[data-finger-group="4"] { fill: var(--finger-4-strong); }
+.hand__finger:is([data-role="primary"], [data-role="modifier"])[data-finger-group="3"] { fill: var(--finger-3-strong); }
+.hand__finger:is([data-role="primary"], [data-role="modifier"])[data-finger-group="2"] { fill: var(--finger-2-strong); }
+.hand__finger:is([data-role="primary"], [data-role="modifier"])[data-finger-group="thumb"] { fill: var(--finger-thumb-strong); }
+
+.hand__finger[data-role="secondary"] {
+  stroke: var(--color-text);
+  stroke-width: 3;
+  stroke-dasharray: 7 5;
+}
+
+@keyframes finger-pulse {
+  50% { stroke-width: 7; }
+}
+
+.hand__badge circle {
+  fill: var(--color-text);
+}
+
+.hand__badge text {
+  fill: var(--color-bg);
+  font: 700 16px system-ui, sans-serif;
+  text-anchor: middle;
+}

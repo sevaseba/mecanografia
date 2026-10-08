@@ -1,5 +1,21 @@
 /* Themes. The active profile mode is set on <html data-mode="adult|kids">. */
 
+/* Shared by every theme: saturated finger colors for the key/finger to use now. */
+:root {
+  --finger-5-strong: #f0558a;
+  --finger-4-strong: #f2b705;
+  --finger-3-strong: #2fbf62;
+  --finger-2-strong: #4a90f0;
+  --finger-thumb-strong: #9aa5b5;
+  --finger-on-strong: #111111;
+  --color-current-bg: color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+[data-mode="kids"] .only-adult,
+[data-mode="adult"] .only-kids {
+  display: none !important;
+}
+
 :root,
 [data-mode="adult"] {
   --font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;

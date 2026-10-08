@@ -3,6 +3,7 @@
 
 import { el } from './dom.js';
 import { strings } from './strings.js';
+import { ROLE_RANK } from './guidance.js';
 
 const PRESS_FLASH_MS = 160;
 
@@ -26,14 +27,20 @@ export function createKeyboardView(layout) {
     element.replaceChildren(...rows);
   }
 
-  /** Highlights the next key and the modifiers to hold with it. Pass null to clear. */
-  function showNext(next) {
+  /** Lights up keys. targets: [{ code, role, badge }] as produced by guidance.js. */
+  function show(targets) {
     for (const keyElement of keyElements.values()) {
-      keyElement.classList.remove('key--next', 'key--next-modifier');
+      keyElement.removeAttribute('data-role');
+      keyElement.querySelector('.key__badge')?.remove();
     }
-    if (!next) return;
-    keyElements.get(next.code)?.classList.add('key--next');
-    for (const code of next.modifiers) keyElements.get(code)?.classList.add('key--next-modifier');
+    for (const { code, role, badge } of targets) {
+      const keyElement = keyElements.get(code);
+      if (!keyElement) continue;
+      // If a key has two roles (Shift for both steps of Ü), the most urgent one wins.
+      const current = keyElement.getAttribute('data-role');
+      if (!current || ROLE_RANK[role] < ROLE_RANK[current]) keyElement.setAttribute('data-role', role);
+      if (badge) keyElement.append(el('span', { class: 'key__badge' }, String(badge)));
+    }
   }
 
   function flash(code) {
@@ -44,17 +51,7 @@ export function createKeyboardView(layout) {
   }
 
   render(layout);
-  return { element, setLayout: render, showNext, flash };
-}
-
-export function renderFingerLegend() {
-  return el(
-    'ul',
-    { class: 'finger-legend' },
-    Object.entries(strings.fingerGroups).map(([group, name]) =>
-      el('li', {}, el('span', { class: 'finger-legend__swatch', 'data-finger-group': group }), name),
-    ),
-  );
+  return { element, setLayout: render, show, flash };
 }
 
 function renderKey(key) {
@@ -87,7 +84,7 @@ function renderKey(key) {
   );
 }
 
-// 'L5' and 'R5' are both pinkies: same color on both hands.
+// 'L5' and 'R5' are both pinkies: same color on both hands. L1, R1 and T are thumbs.
 function fingerGroup(finger) {
-  return finger === 'T' ? 'thumb' : finger.slice(1);
+  return finger === 'T' || finger.endsWith('1') ? 'thumb' : finger.slice(1);
 }

@@ -16,18 +16,10 @@ export const strings = {
 
   freeTyping: {
     title: 'Teclado libre',
-    intro: 'Elegí una distribución y un texto, y escribilo. El teclado de abajo te muestra qué tecla viene.',
-    layoutLabel: 'Distribución del teclado',
-    textLabel: 'Texto de prueba',
-    practiceLabel: 'Área de práctica: escribí el texto que se muestra',
-    startPrompt: 'Hacé clic en el texto o llegá con Tab para empezar a escribir.',
-    restart: 'Reiniciar',
-    progress: (position, total, errors) =>
-      `Llevás ${position} de ${total} caracteres · Errores: ${errors}`,
-    finished: (mistakes) =>
-      mistakes === 0
-        ? '¡Terminaste sin ningún error! ¡Excelente!'
-        : `¡Terminaste! Te equivocaste ${mistakes} ${mistakes === 1 ? 'vez' : 'veces'}.`,
+    layoutLabel: 'Distribución',
+    textLabel: 'Texto',
+    modeLabel: 'Vista',
+    modes: { adult: 'Adulto', kids: 'Infantil' },
     samples: {
       es: {
         name: 'Español',
@@ -40,12 +32,28 @@ export const strings = {
     },
   },
 
-  hint: {
-    nextKey: (keys) => `Próxima tecla: ${keys}.`,
-    deadReady: (deadChar, keys) => `Ya presionaste ${deadChar}. Ahora: ${keys}.`,
-    then: ', después ',
-    key: (label, finger) => `${label} (${finger})`,
-    withModifier: (modifier, key) => `${modifier} + ${key}`,
+  practice: {
+    back: 'Volver al inicio',
+    restart: 'Reiniciar',
+    practiceLabel: 'Área de práctica: escribí el texto que se muestra',
+    focusPrompt: 'Hacé clic acá para escribir',
+    wpm: (wpm) => `${wpm ?? '–'} PPM`,
+    wpmLabel: 'Palabras por minuto',
+    accuracy: (accuracy) => `${accuracy ?? '–'} %`,
+    accuracyLabel: 'Precisión',
+    progress: (position, total) => `${position}/${total}`,
+    progressLabel: 'Avance',
+    finished: '¡Terminaste!',
+    finishedStats: ({ wpm, accuracy }) => `${wpm ?? '–'} PPM · ${accuracy ?? '–'} % de precisión`,
+    // Short finger cue under the hands (adult mode only).
+    fingersNow: (names) => names.join(' + '),
+    fingersThen: (now, then) => `${now} → ${then}`,
+    // Full description for screen readers.
+    srNextKey: (keys) => `Próxima tecla: ${keys}.`,
+    srDeadReady: (deadChar, keys) => `Ya presionaste ${deadChar}. Ahora: ${keys}.`,
+    srThen: ', después ',
+    srKey: (label, finger) => `${label} (${finger})`,
+    srWithModifier: (modifier, key) => `${modifier} + ${key}`,
     space: 'la barra espaciadora',
     enter: 'Entrar',
     shiftLeft: 'Mayús izquierda',
@@ -56,9 +64,6 @@ export const strings = {
   },
 
   layoutCheck: {
-    unsupported:
-      'Tu navegador no permite averiguar la distribución de tu teclado. Si notamos algo raro mientras escribís, te avisamos.',
-    systemMatches: (name) => `Tu compu está configurada con el teclado ${name}.`,
     systemIs: (systemName, selectedName) =>
       `Atención: tu compu está configurada con el teclado ${systemName}, pero acá elegiste ${selectedName}. ` +
       'Las teclas no van a coincidir.',
@@ -67,8 +72,7 @@ export const strings = {
       'Algunas teclas no van a coincidir.',
     typingMismatch: (selectedName) =>
       `Parece que tu teclado no está escribiendo como ${selectedName}: algunas teclas producen otros caracteres.`,
-    howToFix:
-      'Podés elegir otra distribución acá arriba o cambiarla en la configuración de idioma y teclado de tu sistema.',
+    howToFix: 'Elegí otra distribución o cambiala en la configuración de idioma y teclado de tu sistema.',
     useLayout: (name) => `Usar ${name}`,
     noPhysicalKeyboard: 'Para practicar mecanografía necesitás un teclado físico.',
   },
@@ -82,15 +86,9 @@ export const strings = {
     R3: 'mayor derecho',
     R4: 'anular derecho',
     R5: 'meñique derecho',
+    L1: 'pulgar izquierdo',
+    R1: 'pulgar derecho',
     T: 'pulgar',
-  },
-
-  fingerGroups: {
-    5: 'Meñique',
-    4: 'Anular',
-    3: 'Mayor',
-    2: 'Índice',
-    thumb: 'Pulgar',
   },
 
   keyLabels: {
