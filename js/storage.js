@@ -1,11 +1,11 @@
 // Persistent app data: one versioned JSON document in localStorage.
 //
 // {
-//   version: 1,
+//   version: 3,
 //   activeProfileId: string | null,
 //   profiles: [{
 //     id, name, avatar, mode: 'kids' | 'adult', layoutId, createdAt, updatedAt,
-//     settings: { sound: boolean, theme: 'auto' | 'light' | 'dark' },
+//     settings: { sound: boolean, voice: boolean, theme: 'auto' | 'light' | 'dark' },
 //     medals: { [medalId]: ISO date earned },
 //     progress: { [layoutId]: object }   // one course progress per layout (see course.js)
 //   }]
@@ -17,7 +17,7 @@
 import { getLayout, defaultLayoutId } from './layouts/index.js';
 
 export const STORAGE_KEY = 'mecanografia';
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 // MIGRATIONS[n] turns a version-n document into a version-(n + 1) one.
 const MIGRATIONS = {
@@ -25,7 +25,13 @@ const MIGRATIONS = {
   1: (document) => ({
     ...document,
     version: 2,
-    profiles: (document.profiles ?? []).map((profile) => ({ ...profile, settings: defaultSettings(), medals: {} })),
+    profiles: (document.profiles ?? []).map((profile) => ({ ...profile, settings: { sound: false, theme: 'auto' }, medals: {} })),
+  }),
+  // v3: recorded voice for the kids instructions, on by default.
+  2: (document) => ({
+    ...document,
+    version: 3,
+    profiles: (document.profiles ?? []).map((profile) => ({ ...profile, settings: { ...profile.settings, voice: true } })),
   }),
 };
 
@@ -33,7 +39,7 @@ const MODES = ['kids', 'adult'];
 const THEMES = ['auto', 'light', 'dark'];
 
 export function defaultSettings() {
-  return { sound: false, theme: 'auto' };
+  return { sound: false, voice: true, theme: 'auto' };
 }
 const NAME_MAX_LENGTH = 30;
 const BACKUP_APP = 'mecanografia';
@@ -181,6 +187,7 @@ function normalizeSettings(settings) {
   if (!isObject(settings)) return defaults;
   return {
     sound: typeof settings.sound === 'boolean' ? settings.sound : defaults.sound,
+    voice: typeof settings.voice === 'boolean' ? settings.voice : defaults.voice,
     theme: THEMES.includes(settings.theme) ? settings.theme : defaults.theme,
   };
 }

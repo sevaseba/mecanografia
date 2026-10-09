@@ -2,6 +2,7 @@
 //
 // Layout data contract (every file in js/layouts/ follows it):
 // - id, name: identifier and user-facing name. language: ISO code of the course language.
+// - homeRow: codes of the home-row keys, left pinky to right pinky (where the fingers rest).
 // - rows: physical rows, top to bottom. Each key:
 //     code     KeyboardEvent.code of the physical key
 //     finger   L5..L1 / R1..R5 (pinky..thumb), or 'T' for either thumb (Space);
@@ -19,6 +20,7 @@ export default {
   id: 'es-latam',
   name: 'Español Latinoamericano',
   language: 'es',
+  homeRow: ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon'],
   rows: [
     [
       { code: 'Backquote', finger: 'L5', base: '|', shift: '°', altGr: '¬' },

@@ -25,6 +25,12 @@ export function render(container) {
     el('a', { class: 'back-link', href: '#/inicio' }, `← ${text.back}`),
     el('h1', {}, text.title),
     status,
+    el(
+      'a',
+      { class: 'hands-intro-link', href: '#/posicion-de-las-manos' },
+      el('span', { class: 'hands-intro-link__title' }, strings.handsIntro.mapLink),
+      el('span', { class: 'muted' }, strings.handsIntro.mapLinkDescription),
+    ),
   );
 
   // The course loads asynchronously: if the user already left this screen, drop the result

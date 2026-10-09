@@ -1,8 +1,9 @@
 // Service worker: precaches the whole app so it works offline.
 // Bump CACHE_VERSION whenever any precached file changes (lessons included), and add new
-// files to PRECACHE. Lesson files are not listed: they are read from each course index.json.
+// files to PRECACHE. Lesson files and voice clips are not listed: they are read from each
+// course index.json and from the voice index.
 
-const CACHE_VERSION = 'v23';
+const CACHE_VERSION = 'v27';
 const CACHE_NAME = `mecanografia-${CACHE_VERSION}`;
 
 const PRECACHE = [
@@ -13,6 +14,7 @@ const PRECACHE = [
   './css/themes.css',
   './css/keyboard.css',
   './css/practice.css',
+  './css/hands-intro.css',
   './css/profiles.css',
   './css/lessons.css',
   './css/progress.css',
@@ -26,6 +28,9 @@ const PRECACHE = [
   './js/dom.js',
   './js/exercise-generator.js',
   './js/guidance.js',
+  './js/hands-intro.js',
+  './js/hands-intro-copy.js',
+  './js/hands-intro-view.js',
   './js/hands-view.js',
   './js/input.js',
   './js/keyboard-view.js',
@@ -38,6 +43,8 @@ const PRECACHE = [
   './js/random.js',
   './js/router.js',
   './js/sound-toggle.js',
+  './js/voice.js',
+  './js/voice-clips.js',
   './js/sound.js',
   './js/stats.js',
   './js/storage.js',
@@ -49,6 +56,7 @@ const PRECACHE = [
   './js/layouts/es-latam.js',
   './js/layouts/en-us.js',
   './js/screens/free-typing.js',
+  './js/screens/hands-intro.js',
   './js/screens/home.js',
   './js/screens/lesson.js',
   './js/screens/lessons-map.js',
@@ -64,9 +72,12 @@ const PRECACHE = [
   './assets/fonts/nunito-latin.woff2',
   './lessons/es-latam/index.json',
   './lessons/en-us/index.json',
+  './assets/audio/kids/index.json',
 ];
 
 const COURSE_INDEX = /lessons\/[^/]+\/index\.json$/;
+const VOICE_DIR = './assets/audio/kids/';
+const VOICE_INDEX = `${VOICE_DIR}index.json`;
 
 // "reload" bypasses the HTTP cache so a new version never precaches stale files.
 const fresh = (url) => new Request(url, { cache: 'reload' });
@@ -80,6 +91,9 @@ async function precache() {
     const base = indexUrl.replace(/index\.json$/, '');
     await cache.addAll(index.units.flatMap((unit) => unit.lessons).map((id) => fresh(`${base}${id}.json`)));
   }
+  // Every recorded voice clip.
+  const voice = await (await cache.match(VOICE_INDEX)).json();
+  await cache.addAll(voice.clips.map((name) => fresh(`${VOICE_DIR}${name}`)));
 }
 
 // A new version waits ("installed") until the page asks it to take over, after the user

@@ -10,6 +10,7 @@ import * as homeScreen from './screens/home.js';
 import * as freeTypingScreen from './screens/free-typing.js';
 import * as lessonsMapScreen from './screens/lessons-map.js';
 import * as lessonScreen from './screens/lesson.js';
+import * as handsIntroScreen from './screens/hands-intro.js';
 import * as progressScreen from './screens/progress.js';
 import * as notFoundScreen from './screens/not-found.js';
 
@@ -20,6 +21,7 @@ const routes = {
   '/inicio': homeScreen,
   '/lecciones': lessonsMapScreen,
   '/lecciones/:id': lessonScreen,
+  '/posicion-de-las-manos': handsIntroScreen,
   '/teclado-libre': freeTypingScreen,
   '/progreso': progressScreen,
 };

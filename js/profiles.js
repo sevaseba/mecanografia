@@ -96,10 +96,11 @@ export function createProfileService(store, { now = () => new Date(), newId = ra
       });
     },
 
-    /** settings: partial { sound, theme }. */
+    /** settings: partial { sound, voice, theme }. */
     updateSettings(id, settings) {
       const valid =
         (settings.sound === undefined || typeof settings.sound === 'boolean') &&
+        (settings.voice === undefined || typeof settings.voice === 'boolean') &&
         (settings.theme === undefined || THEMES.includes(settings.theme));
       if (!valid) throw new ProfileError('invalid');
       return change((data) => {

@@ -1,0 +1,124 @@
+/* "Posición de las manos": reuses the practice screen layout (practice.css); the step panel
+   takes the place of the text line. It is taller, and as wide as the stage (not just the
+   keyboard) so the explanations take few lines. */
+
+/* Two classes so it also wins over the kids sizes of practice.css. */
+.practice-stage.hands-intro {
+  --line-h: 7.5rem;
+  --cue-h: 0px;
+}
+
+.hands-intro__panel {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--stage-gap);
+  width: min(100cqw - 32px, 64rem);
+  height: var(--line-h);
+  padding: 0.5em 1em;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.hands-intro.is-practice:focus-within .hands-intro__panel {
+  border-color: var(--color-accent);
+}
+
+.hands-intro__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.hands-intro__text p {
+  max-width: none;
+  margin: 0.2em 0 0;
+}
+
+.hands-intro__title {
+  margin: 0;
+  font-size: 1.2em;
+}
+
+.hands-intro__instruction {
+  font-weight: 700;
+}
+
+.hands-intro__feedback {
+  min-height: 1.2em;
+  color: var(--color-text-muted);
+}
+
+.finger-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.2em;
+  margin: 0.3em 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.finger-legend[hidden] {
+  display: none;
+}
+
+.finger-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+.finger-legend__swatch {
+  width: 0.9em;
+  height: 1.3em;
+  border: 2px solid var(--color-key-border);
+  border-radius: 999px;
+}
+
+.finger-legend__swatch[data-finger-group="5"] { background: var(--finger-5-strong); }
+.finger-legend__swatch[data-finger-group="4"] { background: var(--finger-4-strong); }
+.finger-legend__swatch[data-finger-group="3"] { background: var(--finger-3-strong); }
+.finger-legend__swatch[data-finger-group="2"] { background: var(--finger-2-strong); }
+.finger-legend__swatch[data-finger-group="thumb"] { background: var(--finger-thumb-strong); }
+
+.hands-intro__actions {
+  flex: none;
+  display: flex;
+  gap: 0.5em;
+}
+
+/* The prompt only makes sense while waiting for keys (explanation steps use a button). */
+.hands-intro:not(.is-practice) .practice-prompt {
+  display: none;
+}
+
+/* Keys outside the step dim so the lit ones stand out. */
+.keyboard--focus .key:not([data-role]):not(.key--spacer) {
+  opacity: 0.35;
+}
+
+/* --- Lessons map: link to the intro --- */
+
+.hands-intro-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-width: 28rem;
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.hands-intro-link:hover {
+  border-color: var(--color-accent);
+}
+
+.hands-intro-link__title {
+  font-weight: 700;
+  color: var(--color-link);
+}

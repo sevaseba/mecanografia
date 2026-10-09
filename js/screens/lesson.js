@@ -1,6 +1,7 @@
 // A lesson (#/lecciones/:id): its fixed exercises plus a random one, typed in a row on the
 // practice view, then the results saved to the profile's progress. Kids get cheers, medals
 // and confetti; adults get gross/net WPM and corrected/uncorrected errors.
+// The first time in a course, the hands intro ("Posición de las manos") comes before.
 
 import { el } from '../dom.js';
 import { strings } from '../strings.js';
@@ -26,6 +27,9 @@ import { newMedals } from '../achievements.js';
 import { createSoundToggle } from '../sound-toggle.js';
 import { launchConfetti } from '../confetti.js';
 import { pickOne } from '../random.js';
+import { isIntroDone } from '../hands-intro.js';
+import { createHandsIntroView } from '../hands-intro-view.js';
+import { saveIntroDone, voiceOptions } from './hands-intro.js';
 
 const text = strings.lessons;
 const keyIndexes = layouts.map(createKeyIndex);
@@ -41,6 +45,7 @@ export function render(container, params) {
   }
 
   let view = null;
+  let intro = null;
   let pauseTimer = null;
   let left = false;
 
@@ -56,12 +61,30 @@ export function render(container, params) {
         return;
       }
       document.title = `${text.lessonTitle(lesson.number, lesson.title)} · ${strings.appName}`;
-      start(course, lesson);
+      if (isIntroDone(profiles.progressFor(profile.id, profile.layoutId))) start(course, lesson);
+      else showIntro(course, lesson);
     },
     () => {
       container.replaceChildren(el('p', { class: 'alert alert--warning' }, text.loadError));
     },
   );
+
+  function showIntro(course, lesson) {
+    intro = createHandsIntroView({
+      keyIndex: keyIndexes.find((index) => index.layout.id === profile.layoutId),
+      backHref: '#/lecciones',
+      finishLabel: strings.handsIntro.startLesson,
+      ...voiceOptions(profile),
+      onDone: () => {
+        saveIntroDone(profile);
+        intro.destroy();
+        intro = null;
+        start(course, lesson);
+      },
+    });
+    container.replaceChildren(intro.element);
+    intro.start();
+  }
 
   function start(course, lesson) {
     const mode = profiles.get(profile.id).mode;
@@ -135,6 +158,7 @@ export function render(container, params) {
   return () => {
     left = true;
     clearTimeout(pauseTimer);
+    intro?.destroy();
     view?.destroy();
   };
 }

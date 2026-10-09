@@ -17,3 +17,11 @@
 - Toda pantalla con trabajo asíncrono devuelve una limpieza que marca "ya salí" y descarta resultados tardíos.
 - Al probar algo asíncrono, probar también con la caché en frío (recargar la página), no solo la segunda vez.
 - En pestañas en segundo plano Chrome frena los temporizadores: los scripts de prueba no deben esperar por carácter; esperar condiciones, no tiempos.
+
+## 2026-10-09 — Verificando CSS con el service worker activo
+
+**Qué pasó:** después de cambiar `css/hands-intro.css`, las mediciones en el navegador no cambiaban: el service worker (cache-first) seguía sirviendo la copia precacheada al instalarse.
+
+**Reglas:**
+- Antes de verificar un cambio en el navegador, desregistrar el service worker y borrar las cachés (`navigator.serviceWorker.getRegistrations()` + `caches.keys()`), y recargar. Repetirlo después de cada cambio de archivos.
+- Si una medición "no cambia" después de editar, sospechar primero de la caché.

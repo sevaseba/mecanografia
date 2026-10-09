@@ -28,7 +28,7 @@ const profile = (overrides = {}) => ({
   createdAt: '2026-10-08T00:00:00.000Z',
   updatedAt: '2026-10-08T00:00:00.000Z',
   progress: {},
-  settings: { sound: false, theme: 'auto' },
+  settings: { sound: false, voice: true, theme: 'auto' },
   medals: {},
   ...overrides,
 });
@@ -139,18 +139,25 @@ test('rejects files that are not backups, with a reason', () => {
 test('migrates version 1 documents: adds settings and medals', () => {
   const v1 = { version: 1, activeProfileId: 'p1', profiles: [profile({ settings: undefined, medals: undefined })] };
   const data = createStore(memoryBackend({ [STORAGE_KEY]: JSON.stringify(v1) })).read();
-  assert.equal(data.version, 2);
-  assert.deepEqual(data.profiles[0].settings, { sound: false, theme: 'auto' });
+  assert.equal(data.version, SCHEMA_VERSION);
+  assert.deepEqual(data.profiles[0].settings, { sound: false, voice: true, theme: 'auto' });
   assert.deepEqual(data.profiles[0].medals, {});
+});
+
+test('migrates version 2 documents: the voice is on, other settings are kept', () => {
+  const v2 = { version: 2, activeProfileId: 'p1', profiles: [profile({ settings: { sound: true, theme: 'dark' } })] };
+  const data = createStore(memoryBackend({ [STORAGE_KEY]: JSON.stringify(v2) })).read();
+  assert.equal(data.version, 3);
+  assert.deepEqual(data.profiles[0].settings, { sound: true, voice: true, theme: 'dark' });
 });
 
 test('normalizes settings and medals', () => {
   const stored = {
-    version: 2,
+    version: 3,
     activeProfileId: null,
-    profiles: [profile({ settings: { sound: 'yes', theme: 'neon' }, medals: { a: 'T1', b: 5 } })],
+    profiles: [profile({ settings: { sound: 'yes', voice: 'no', theme: 'neon' }, medals: { a: 'T1', b: 5 } })],
   };
   const data = createStore(memoryBackend({ [STORAGE_KEY]: JSON.stringify(stored) })).read();
-  assert.deepEqual(data.profiles[0].settings, { sound: false, theme: 'auto' });
+  assert.deepEqual(data.profiles[0].settings, { sound: false, voice: true, theme: 'auto' });
   assert.deepEqual(data.profiles[0].medals, { a: 'T1' });
 });

@@ -5,6 +5,7 @@ export default {
   id: 'en-us',
   name: 'Inglés (US)',
   language: 'en',
+  homeRow: ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon'],
   rows: [
     [
       { code: 'Backquote', finger: 'L5', base: '`', shift: '~' },

@@ -52,6 +52,11 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │   ├── course.js         # carga de cursos, estrellas, desbloqueo, recomendada, registro de intentos
 │   ├── exercise-generator.js # ejercicio al azar de cada lección
 │   ├── lesson-badges.js  # estrellas y teclas (keycaps) para mapa y resultados
+│   ├── hands-intro.js    # pasos de la guía "Posición de las manos" (lógica pura)
+│   ├── hands-intro-view.js # pantalla de la guía: panel del paso + teclado + manos
+│   ├── hands-intro-copy.js # textos de la guía por modo (los mismos que se graban)
+│   ├── voice.js          # reproduce los clips de voz grabados, en orden
+│   ├── voice-clips.js    # frase → nombre de archivo del clip
 │   ├── guidance.js       # qué teclas y dedos iluminar para el próximo carácter
 │   ├── practice-view.js  # pantalla de práctica (teclado libre y lecciones)
 │   ├── text-line-view.js # línea única de texto que se desplaza
@@ -69,7 +74,10 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │       ├── index.json
 │       └── 01-f-j.json, ...
 ├── tests/                # pruebas de la lógica pura: `node --test` desde la raíz
+├── tools/                # herramientas de desarrollo (no son parte de la app)
+│   └── generate-voice.mjs # graba los clips de voz con ElevenLabs (voz rioplatense)
 ├── icons/                # íconos de la PWA (192, 512, maskable)
+├── assets/audio/kids/    # clips de voz (mp3) + index.json con la lista
 └── assets/fonts/         # Nunito (modo infantil), con su licencia OFL
 ```
 
@@ -91,12 +99,24 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 ## Datos y perfiles
 
 - Todo se guarda en **una** clave de localStorage, `mecanografia`, como documento JSON con `version` (esquema documentado al principio de `js/storage.js`). Para cambiar la forma: subir `SCHEMA_VERSION` y agregar `MIGRATIONS[versiónVieja]`; nunca leer ni escribir localStorage fuera de `storage.js`.
-- El progreso va en `profile.progress[layoutId]`: un curso por distribución dentro del mismo perfil, con `keyStats` (errores e intentos por carácter). En el perfil: `settings` (sonido, tema) y `medals` (se guardan al ganarse). Esquema actual: versión 2.
+- El progreso va en `profile.progress[layoutId]`: un curso por distribución dentro del mismo perfil, con `keyStats` (errores e intentos por carácter). En el perfil: `settings` (sonido, voz, tema) y `medals` (se guardan al ganarse). Esquema actual: versión 3.
 - Respaldo: `{ app: "mecanografia", type: "backup", exportedAt, data }`. Importar valida, migra y reemplaza todo previa confirmación.
 - Pantallas que cargan datos de forma asíncrona deben devolver una función de limpieza y descartar resultados que lleguen después de salir de la pantalla (si no, dibujan dentro de la pantalla siguiente).
 - `#/progreso` muestra "Mi progreso" (promedios de las últimas 10 sesiones de lecciones, racha, gráfico, teclas con más errores, medallas en infantil), con selector de distribución.
-- Pantallas: `#/` elegir perfil (y respaldo; mostrarla deja sin perfil activo), `#/perfiles/nuevo`, `#/perfiles/:id/editar`, `#/inicio` del perfil activo, `#/lecciones` (mapa), `#/lecciones/:id`, `#/teclado-libre`. Las pantallas que necesitan un perfil activo redirigen a `#/`.
+- Pantallas: `#/` elegir perfil (y respaldo; mostrarla deja sin perfil activo), `#/perfiles/nuevo`, `#/perfiles/:id/editar`, `#/inicio` del perfil activo, `#/lecciones` (mapa), `#/lecciones/:id`, `#/posicion-de-las-manos`, `#/teclado-libre`. Las pantallas que necesitan un perfil activo redirigen a `#/`.
 - El modo (`data-mode` en `<html>`) y la distribución de la práctica salen del perfil activo.
+
+## Posición de las manos
+
+Guía interactiva que se muestra sola antes de la primera lección de cada curso (y se repite desde el enlace del mapa). Cinco pasos: los colores de los dedos, la fila guía (relieves de F y J, pulgares en el espacio), presionar cada tecla de la fila guía y el espacio, y la zona de cada dedo (tecla de arriba e ida y vuelta a la fila guía). Botón "Saltear" siempre visible.
+- Todo sale de los datos de la distribución: `homeRow` (códigos de la fila guía, meñique izquierdo a meñique derecho) y el `finger` de cada tecla.
+- Las teclas se reconocen por `KeyboardEvent.code` (posición física), no por el carácter.
+- Cada texto tiene dos versiones en `strings.handsIntro` (`kids` corta y directa, `adult` completa): los chicos leen menos.
+- En infantil el dedo se nombra **por su color** ("con el dedo rosa"), no por su nombre ni su mano: muchos chicos no saben cuál es el anular o el mayor, ni distinguen izquierda y derecha; la mano la muestra el dibujo. Los nombres se enseñan sin exigirlos en la leyenda del paso "Tus dedos". Los colores de `strings.handsIntro.kidsFingers` deben coincidir con `--finger-*` de `css/themes.css`.
+- **Voz (solo infantil):** los textos de los chicos se leen con clips grabados con ElevenLabs y una voz rioplatense de su biblioteca (las voces genéricas sonaban a "yankee hablando español" y no pronunciaban el voseo). Las letras sueltas se leen por su nombre ("la efe"), ver `spokenText`. Interruptor "Voz" (`settings.voice`, prendido por defecto) y botón "Escuchar".
+  - Cada clip se llama como su frase (`voice-clips.js`), así las frases repetidas entre distribuciones comparten archivo. Solo se reproducen los clips listados en `assets/audio/kids/index.json`.
+  - Al cambiar un texto infantil de la guía: `node tools/generate-voice.mjs` (necesita `ELEVENLABS_API_KEY` y `ELEVENLABS_VOICE_ID`; `--list` muestra qué falta sin grabar; `--force` regraba todo, por ejemplo al cambiar de voz) y subir `CACHE_VERSION`. El service worker guarda los clips leyendo ese index.json.
+- Al terminar o saltear se guarda `progress[layoutId].introCompletedAt`: es por distribución, como el resto del curso.
 
 ## Pantalla de práctica
 

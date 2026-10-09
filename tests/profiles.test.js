@@ -81,7 +81,7 @@ test('notifies listeners on every change', () => {
 
 test('new profiles start with sound off, automatic theme and no medals', () => {
   const created = service().create(input);
-  assert.deepEqual(created.settings, { sound: false, theme: 'auto' });
+  assert.deepEqual(created.settings, { sound: false, voice: true, theme: 'auto' });
   assert.deepEqual(created.medals, {});
 });
 
@@ -90,9 +90,11 @@ test('settings and medals are updated without touching the rest', () => {
   const { id } = profiles.create(input);
   profiles.updateSettings(id, { sound: true });
   profiles.updateSettings(id, { theme: 'dark' });
-  assert.deepEqual(profiles.get(id).settings, { sound: true, theme: 'dark' });
+  profiles.updateSettings(id, { voice: false });
+  assert.deepEqual(profiles.get(id).settings, { sound: true, voice: false, theme: 'dark' });
   profiles.awardMedals(id, ['first-lesson'], 'T1');
   profiles.awardMedals(id, ['first-lesson', 'five-lessons'], 'T2'); // already earned keeps its date
   assert.deepEqual(profiles.get(id).medals, { 'first-lesson': 'T1', 'five-lessons': 'T2' });
   assert.throws(() => profiles.updateSettings(id, { theme: 'neon' }), (e) => e.reason === 'invalid');
+  assert.throws(() => profiles.updateSettings(id, { voice: 'yes' }), (e) => e.reason === 'invalid');
 });

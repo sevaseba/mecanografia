@@ -142,6 +142,12 @@ export const strings = {
     off: 'Sonido desactivado',
   },
 
+  voice: {
+    label: 'Voz',
+    on: 'Voz activada: se leen las indicaciones',
+    off: 'Voz desactivada',
+  },
+
   progress: {
     title: 'Mi progreso',
     back: 'Volver al inicio',
@@ -230,6 +236,87 @@ export const strings = {
     retry: 'Repetir',
     backToMap: 'Ver todas las lecciones',
     courseFinished: '¡Terminaste el curso!',
+  },
+
+  handsIntro: {
+    title: 'Posición de las manos',
+    mapLink: 'Posición de las manos',
+    mapLinkDescription: 'Repasá dónde va cada dedo antes de empezar.',
+    stepCounter: (current, total) => `Paso ${current} de ${total}`,
+    next: 'Siguiente',
+    skip: 'Saltear',
+    listen: 'Escuchar',
+    startLesson: 'Empezar la lección',
+    backToMap: 'Volver a las lecciones',
+    // Each text comes in two versions: kids read less, so theirs is short and direct.
+    // Bodies receive the index fingers' keys (left, right) and the home row labels.
+    steps: {
+      fingers: {
+        title: 'Tus dedos',
+        adult: () =>
+          'Cada dedo tiene un color. Las teclas del mismo color se presionan siempre con ese dedo. ' +
+          'Los pulgares se encargan de la barra espaciadora.',
+        kids: () => 'Cada dedo tiene un color. Aprieta las teclas de su mismo color.',
+      },
+      home: {
+        title: 'La fila guía',
+        adult: (left, right, keys) =>
+          `Apoyá los dedos índice sobre la ${left} y la ${right}: tienen un relieve que se siente con la yema. ` +
+          `Los demás dedos van al lado, uno en cada tecla: ${keys}. Los pulgares descansan sobre la barra espaciadora.`,
+        kids: (left, right) => `Poné los índices en la ${left} y la ${right}: tienen una rayita. Los otros dedos van al lado.`,
+      },
+      homeKeys: {
+        title: 'Probá cada dedo',
+        adult: () => 'Con las manos en la fila guía, presioná la tecla iluminada con el dedo iluminado.',
+        kids: () => 'Apretá la tecla que brilla.',
+      },
+      zones: {
+        title: 'La zona de cada dedo',
+        adult: () => 'Cada dedo se estira hasta las teclas de su color y después vuelve a su lugar en la fila guía.',
+        kids: () => 'Estirá el dedo y volvé a tu lugar.',
+      },
+      done: {
+        title: '¡Listo!',
+        adult: (left, right) =>
+          `Ya sabés dónde va cada dedo. Cada vez que empieces, buscá los relieves de la ${left} y la ${right} y apoyá las manos en la fila guía.`,
+        kids: () => '¡Ya sabés dónde va cada dedo!',
+      },
+    },
+    // Kids may not know "anular" or "mayor" (nor left from right): their texts name the
+    // finger by its color, and the hands drawing shows which hand.
+    pressKey: {
+      adult: (key, finger) => `Presioná ${key} con el ${finger}.`,
+      kids: (key, finger) => `Apretá ${key} con ${finger}.`,
+    },
+    backHome: {
+      adult: (key, finger) => `Ahora volvé a ${key} con el ${finger}.`,
+      kids: (key) => `¡Volvé a ${key}!`,
+    },
+    // Finger colors as painted in css/themes.css (--finger-*): keep both in sync.
+    kidsFingers: {
+      L5: 'el dedo rosa',
+      L4: 'el dedo amarillo',
+      L3: 'el dedo verde',
+      L2: 'el dedo azul',
+      R2: 'el dedo azul',
+      R3: 'el dedo verde',
+      R4: 'el dedo amarillo',
+      R5: 'el dedo rosa',
+      T: 'el pulgar',
+    },
+    // Step "Tus dedos": each finger's name next to its color, pinky to thumb.
+    fingerLegend: [
+      { group: '5', name: 'meñique' },
+      { group: '4', name: 'anular' },
+      { group: '3', name: 'mayor' },
+      { group: '2', name: 'índice' },
+      { group: 'thumb', name: 'pulgar' },
+    ],
+    letter: (label) => `la ${label}`,
+    otherKey: (label) => `la tecla ${label}`,
+    spaceBar: 'la barra espaciadora',
+    miss: { adult: '¡Casi! Buscá la tecla iluminada.', kids: '¡Casi! Buscá la tecla que brilla.' },
+    focusPrompt: 'Hacé clic acá para seguir',
   },
 
   freeTyping: {
