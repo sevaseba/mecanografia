@@ -32,6 +32,13 @@
   --font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-size-base: 18px;
   --font-size-h1: 2rem;
+  /* Type scale, relative to the base size (each mode sets its own base). Use these steps,
+     not sizes of their own; only the keyboard and the text line size from the key size. */
+  --text-sm: 0.9rem; /* secondary info: hints, statuses, summaries (the smallest text) */
+  --text-md: 1rem; /* body */
+  --text-lg: 1.25rem; /* section titles (h2), card titles, highlighted figures */
+  --text-xl: 1.6rem; /* big card titles */
+  --text-display: 2.2rem; /* big numbers */
   --radius: 8px;
   --focus-width: 3px;
   --space-sm: 0.5rem;

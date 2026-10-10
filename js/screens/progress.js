@@ -8,14 +8,14 @@ import { redirect } from '../router.js';
 import { profiles } from '../profiles.js';
 import { layouts, getLayout } from '../layouts/index.js';
 import { createKeyIndex } from '../keystrokes.js';
-import { getCourse, lessonStates } from '../course.js';
-import { currentStreak, attemptDates, troubleKeys } from '../achievements.js';
+import { getCourse } from '../course.js';
+import { troubleKeys } from '../achievements.js';
+import { summarizeProgress } from '../progress-summary.js';
 import { createKeyboardView } from '../keyboard-view.js';
 import { createWpmChart } from '../wpm-chart.js';
 import { renderMedal } from '../lesson-badges.js';
 
 const text = strings.progress;
-const RECENT_SESSIONS = 10;
 const CHART_SESSIONS = 30;
 const TROUBLE_KEYS = 5;
 
@@ -38,9 +38,14 @@ export function render(container) {
 
   container.append(
     el('a', { class: 'back-link', href: '#/inicio' }, `← ${text.back}`),
-    el('h1', {}, text.title),
+    // The layout selector is rarely used: beside the title, not before the numbers.
+    el(
+      'div',
+      { class: 'progress-header' },
+      el('h1', {}, text.title),
+      el('div', { class: 'field field--inline' }, el('label', { for: 'progress-layout' }, text.layoutLabel), layoutSelect),
+    ),
     el('p', { class: 'muted' }, text.description),
-    el('div', { class: 'field field--inline' }, el('label', { for: 'progress-layout' }, text.layoutLabel), layoutSelect),
     content,
   );
 
@@ -71,20 +76,16 @@ export function render(container) {
 function renderProgress(profile, layoutId, course) {
   const progress = profile.progress[layoutId] ?? {};
   const history = progress.history ?? [];
-  const recent = history.slice(-RECENT_SESSIONS);
-  const recentWithWpm = recent.filter((entry) => entry.wpm !== null);
-  const average = (list, pick) => (list.length ? Math.round(list.reduce((sum, item) => sum + pick(item), 0) / list.length) : null);
-  const states = lessonStates(course, progress, profile.mode);
-  const passed = [...states.values()].filter((state) => state.status === 'completed').length;
-  const streak = currentStreak(attemptDates(profile));
+  const summary = summarizeProgress(profile, layoutId, course);
+  const kids = profile.mode === 'kids';
 
   const tiles = el(
     'ul',
     { class: 'stat-tiles' },
-    statTile(text.avgWpm, average(recentWithWpm, (entry) => entry.wpm) ?? text.none, text.avgWpmHint),
-    statTile(text.avgAccuracy, recent.length ? `${average(recent, (entry) => entry.accuracy)} %` : text.none, text.avgWpmHint),
-    statTile(text.lessonsPassed, `${passed}/${course.lessons.length}`),
-    statTile(text.streak, text.streakDays(streak), text.streakHint),
+    statTile(kids ? text.avgWpmKids : text.avgWpm, summary.avgWpm ?? text.none, text.avgWpmHint),
+    statTile(text.avgAccuracy, summary.avgAccuracy === null ? text.none : `${summary.avgAccuracy} %`, text.avgWpmHint),
+    statTile(text.lessonsPassed, `${summary.passed}/${summary.total}`),
+    statTile(text.streak, text.streakDays(summary.streak), text.streakHint),
   );
 
   const chartSessions = history.filter((entry) => entry.wpm !== null).slice(-CHART_SESSIONS);
@@ -92,12 +93,15 @@ function renderProgress(profile, layoutId, course) {
     ? createWpmChart(chartSessions)
     : el('p', { class: 'muted' }, text.noSessions);
 
-  return [
-    tiles,
-    el('section', { class: 'progress-section', 'aria-labelledby': 'chart-title' }, el('h2', { id: 'chart-title' }, text.chartTitle), chart),
-    troubleSection(progress.keyStats ?? {}, layoutId),
-    medalsSection(profile, course),
-  ];
+  const chartSection = el(
+    'section',
+    { class: 'progress-section', 'aria-labelledby': 'chart-title' },
+    el('h2', { id: 'chart-title' }, kids ? text.chartTitleKids : text.chartTitle),
+    chart,
+  );
+  const trouble = troubleSection(progress.keyStats ?? {}, layoutId);
+  // Kids: the medals first, they are what they come to see.
+  return kids ? [medalsSection(profile, course), tiles, trouble, chartSection] : [tiles, chartSection, trouble];
 }
 
 function statTile(label, value, hint) {
@@ -165,7 +169,7 @@ function medalsSection(profile, course) {
   ];
   return el(
     'section',
-    { class: 'progress-section only-kids', 'aria-labelledby': 'medals-title' },
+    { class: 'progress-section', 'aria-labelledby': 'medals-title' },
     el('h2', { id: 'medals-title' }, strings.medals.title),
     el('ul', { class: 'medal-list' }, ids.map((id) => el('li', {}, renderMedal(id, course, Boolean(profile.medals[id]))))),
   );

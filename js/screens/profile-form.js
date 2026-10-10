@@ -109,16 +109,24 @@ export function render(container, params) {
 
   // --- Form ---
   const formError = el('p', { class: 'field-error', role: 'alert', hidden: true });
+  // Grouped so it fits a laptop screen: who practices and how it looks side by side, the keyboard below.
   const form = el(
     'form',
     { class: 'profile-form', novalidate: true },
-    el('div', { class: 'field' }, el('label', { for: 'profile-name' }, text.nameLabel), nameInput, nameError),
-    avatarField.element,
-    modeField.element,
-    themeField.element,
-    handsPicker.element,
-    layoutField.element,
-    el('details', { class: 'calibration-details' }, el('summary', {}, strings.calibration.title), calibration.element),
+    el(
+      'div',
+      { class: 'profile-form__columns' },
+      formGroup('who', text.groups.who, [
+        el('div', { class: 'field' }, el('label', { for: 'profile-name' }, text.nameLabel), nameInput, nameError),
+        avatarField.element,
+        modeField.element,
+      ]),
+      formGroup('look', text.groups.look, [themeField.element, handsPicker.element]),
+    ),
+    formGroup('keyboard', text.groups.keyboard, [
+      layoutField.element,
+      el('details', { class: 'calibration-details' }, el('summary', {}, strings.calibration.title), calibration.element),
+    ]),
     formError,
     el(
       'div',
@@ -206,6 +214,15 @@ function optionCard(name, description) {
 }
 
 /** Accessible radio group (native radios, styled as tiles). */
+function formGroup(id, title, fields) {
+  return el(
+    'section',
+    { class: 'profile-form__group', 'aria-labelledby': `profile-group-${id}` },
+    el('h2', { id: `profile-group-${id}` }, title),
+    fields,
+  );
+}
+
 function radioGroup(name, legend, options, selected, layoutClass) {
   const inputs = options.map(({ value }) =>
     el('input', { type: 'radio', name, value, checked: value === selected, class: 'choice-tile__input' }),

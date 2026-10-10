@@ -2,12 +2,17 @@
 
 /* --- Picker --- */
 
+.picker-title {
+  text-align: center;
+}
+
 .profile-grid {
   list-style: none;
   margin: var(--space-lg) 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 13rem));
+  justify-content: center;
   gap: var(--space-md);
 }
 
@@ -59,13 +64,13 @@
 
 .profile-card__name {
   font-weight: 700;
-  font-size: 1.15em;
+  font-size: var(--text-lg);
   text-align: center;
   overflow-wrap: anywhere;
 }
 
 .profile-card__summary {
-  font-size: 0.8em;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
   text-align: center;
 }
@@ -75,7 +80,7 @@
   justify-content: space-around;
   padding: 0.4rem;
   border-top: 1px solid var(--color-border);
-  font-size: 0.9em;
+  font-size: var(--text-sm);
 }
 
 .link-button {
@@ -96,11 +101,22 @@
   margin-top: var(--space-lg);
   padding-top: var(--space-md);
   border-top: 1px solid var(--color-border);
+  text-align: center;
 }
 
-.backup h2 {
-  font-size: 1.2em;
+.backup summary {
+  cursor: pointer;
+  color: var(--color-link);
 }
+
+.backup[open] {
+  text-align: start;
+}
+
+.backup[open] summary {
+  margin-bottom: var(--space-sm);
+}
+
 
 .backup__actions,
 .form-actions {
@@ -119,7 +135,34 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  max-width: 44rem;
+}
+
+.profile-form__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.profile-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.profile-form__group h2 {
+  margin: 0;
+}
+
+/* Save is always in view: the bar sticks to the bottom of the window while the form scrolls. */
+.profile-form .form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  margin: 0 calc(-1 * var(--space-md));
+  padding: var(--space-sm) var(--space-md);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
 }
 
 input[type="text"] {
@@ -152,12 +195,12 @@ input[aria-invalid="true"] {
 
 .option-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
   gap: 0.75rem;
 }
 
 .option-grid--compact {
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
 }
 
 /* Native radios kept focusable and in place, drawn as tiles. */
@@ -217,7 +260,7 @@ input[aria-invalid="true"] {
 
 .option-card__description {
   display: block;
-  font-size: 0.9em;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
@@ -253,7 +296,7 @@ input[aria-invalid="true"] {
 }
 
 .calibration__prompt {
-  font-size: 1.2em;
+  font-size: var(--text-lg);
   font-weight: 700;
 }
 
@@ -329,9 +372,6 @@ input[aria-invalid="true"] {
   background: rgb(0 0 0 / 0.5);
 }
 
-.dialog h2 {
-  font-size: 1.3em;
-}
 
 .dialog__actions {
   display: flex;
@@ -344,6 +384,7 @@ input[aria-invalid="true"] {
 
 .home-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
@@ -359,10 +400,21 @@ input[aria-invalid="true"] {
   margin: 0;
 }
 
+.home-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem var(--space-md);
+  margin: 0.2rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 700;
+}
+
+/* Lessons and free typing side by side when they fit. */
 .home-actions {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
   gap: var(--space-md);
-  max-width: 36rem;
 }
 
 .home-action {
@@ -392,13 +444,13 @@ input[aria-invalid="true"] {
 }
 
 .home-action__title {
-  font-size: 1.5em;
+  font-size: var(--text-xl);
   font-weight: 700;
 }
 
 .home-links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-lg);
-  margin-top: var(--space-lg);
+  gap: 0.2rem var(--space-lg);
+  margin-left: auto;
 }

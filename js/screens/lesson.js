@@ -216,13 +216,13 @@ function medalsEarned(course, medals) {
 
 function results({ course, lesson, stats, stars, goal, goals, isRecord, kids, medals, sentence, say, retry }) {
   const passed = stars > 0;
-  // Kids: varied, always positive words. Adults: plain facts.
+  // Kids: varied, always positive words, and one sentence (the one the voice says). Adults: plain facts.
   const heading = kids ? pickOne(passed ? strings.encouragement.passed : strings.encouragement.retry) : passed ? text.passedTitle : text.failedTitle;
   const message = kids
-    ? pickOne(passed ? strings.encouragement.passedMessage : strings.encouragement.retryMessage)
+    ? null
     : passed
       ? goal
-        ? null // the star goals below say what is missing
+        ? null // the star goals say what is missing
         : text.perfect
       : text.failedMessage(PASS_ACCURACY);
   const next = course.next(lesson.id);
@@ -230,54 +230,57 @@ function results({ course, lesson, stats, stars, goal, goals, isRecord, kids, me
   if (passed && next) {
     actions.push(el('a', { class: 'button', href: `#/lecciones/${encodeURIComponent(next.id)}` }, text.nextLesson));
   }
-  actions.push(
-    el('button', { type: 'button', class: passed && next ? 'button button--secondary' : 'button', onClick: retry }, text.retry),
-    el('a', { class: 'button button--secondary', href: '#/lecciones' }, text.backToMap),
-  );
+  actions.push(el('button', { type: 'button', class: passed && next ? 'button button--secondary' : 'button', onClick: retry }, text.retry));
 
+  // Summary and buttons on the left, the star goals on the right: the next step is always in view.
   return el(
     'section',
     { class: `results ${passed ? 'results--passed' : 'results--failed'}` },
     el(
       'div',
-      { class: 'results__lesson' },
-      el('span', { class: 'muted' }, text.lessonTitle(lesson.number, lesson.title)),
-      renderKeycaps(lesson.newKeys, text.review),
+      { class: 'results__summary' },
+      el(
+        'div',
+        { class: 'results__lesson' },
+        el('span', { class: 'muted' }, text.lessonTitle(lesson.number, lesson.title)),
+        renderKeycaps(lesson.newKeys, text.review),
+      ),
+      el('h1', {}, heading),
+      renderStars(stars, { large: true }),
+      el(
+        'p',
+        { class: 'results__stats' },
+        el('span', {}, text.accuracy(stats.accuracy ?? 0)),
+        el('span', { class: 'only-adult' }, text.netWpm(stats.wpm)),
+        el('span', { class: 'only-adult' }, text.grossWpm(stats.grossWpm)),
+      ),
+      el(
+        'p',
+        { class: 'results__details only-adult' },
+        el('span', {}, text.correctedErrors(stats.correctedErrors)),
+        el('span', {}, text.uncorrectedErrors(stats.uncorrectedErrors)),
+      ),
+      isRecord ? el('p', { class: 'results__record' }, text.newRecord) : null,
+      message ? el('p', {}, message) : null,
+      kids
+        ? el(
+            'p',
+            { class: 'results__voice' },
+            el('span', {}, sentence),
+            el(
+              'button',
+              { type: 'button', class: 'button button--secondary button--small', onClick: say },
+              el('span', { 'aria-hidden': 'true' }, '🔊 '),
+              strings.handsIntro.listen,
+            ),
+          )
+        : null,
+      kids && medals.length ? medalsEarned(course, medals) : null,
+      passed && !next ? el('p', { class: 'results__record' }, text.courseFinished) : null,
+      el('div', { class: 'results__actions' }, actions),
+      el('a', { href: '#/lecciones' }, text.backToMap),
     ),
-    el('h1', {}, heading),
-    renderStars(stars, { large: true }),
-    el(
-      'p',
-      { class: 'results__stats' },
-      el('span', {}, text.accuracy(stats.accuracy ?? 0)),
-      el('span', { class: 'only-adult' }, text.netWpm(stats.wpm)),
-      el('span', { class: 'only-adult' }, text.grossWpm(stats.grossWpm)),
-    ),
-    el(
-      'p',
-      { class: 'results__details only-adult' },
-      el('span', {}, text.correctedErrors(stats.correctedErrors)),
-      el('span', {}, text.uncorrectedErrors(stats.uncorrectedErrors)),
-    ),
-    isRecord ? el('p', { class: 'results__record' }, text.newRecord) : null,
-    message ? el('p', {}, message) : null,
-    kids
-      ? el(
-          'p',
-          { class: 'results__voice' },
-          el('span', {}, sentence),
-          el(
-            'button',
-            { type: 'button', class: 'button button--secondary button--small', onClick: say },
-            el('span', { 'aria-hidden': 'true' }, '🔊 '),
-            strings.handsIntro.listen,
-          ),
-        )
-      : null,
     starGoalsList(goals, kids),
-    kids && medals.length ? medalsEarned(course, medals) : null,
-    passed && !next ? el('p', { class: 'results__record' }, text.courseFinished) : null,
-    el('div', { class: 'results__actions' }, actions),
   );
 }
 

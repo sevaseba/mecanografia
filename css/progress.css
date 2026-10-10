@@ -2,9 +2,18 @@
 
 .field--inline {
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-sm);
-  margin-bottom: var(--space-md);
+  margin: 0;
+}
+
+.progress-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-lg);
 }
 
 .stat-tiles {
@@ -31,14 +40,14 @@
 }
 
 .stat-tile__value {
-  font-size: 2em;
+  font-size: var(--text-display);
   font-weight: 700;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
 }
 
 .stat-tile__hint {
-  font-size: 0.8em;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
@@ -46,9 +55,6 @@
   margin-bottom: var(--space-lg);
 }
 
-.progress-section h2 {
-  font-size: 1.25em;
-}
 
 /* --- WPM chart --- */
 
@@ -130,7 +136,7 @@
   border-radius: 6px;
   background: var(--color-text);
   color: var(--color-bg);
-  font-size: 0.85em;
+  font-size: var(--text-sm);
   white-space: nowrap;
   pointer-events: none;
 }
@@ -182,6 +188,11 @@
 
   max-width: 100%;
   overflow-x: auto;
+}
+
+/* As wide as its keys: the frame must not stretch to the page width. */
+.progress-keyboard .keyboard {
+  width: fit-content;
 }
 
 /* --- Medals --- */
@@ -247,7 +258,7 @@
   border-radius: var(--radius);
   background: var(--color-text);
   color: var(--color-bg);
-  font-size: 16px;
+  font-size: var(--text-sm);
   box-shadow: 0 8px 24px rgb(0 0 0 / 0.3);
 }
 

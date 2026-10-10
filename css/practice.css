@@ -17,8 +17,9 @@ main:has(> .practice-screen) {
 
 .practice-bar {
   display: flex;
+  flex-wrap: wrap; /* a phone gets two rows instead of a page wider than the screen */
   align-items: center;
-  gap: 1rem;
+  gap: 0.25rem 1rem;
   padding: 6px 16px;
   font-size: 16px;
   background: var(--color-surface);
@@ -42,9 +43,10 @@ main:has(> .practice-screen) {
 .stats {
   display: flex;
   flex: 1;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.25rem 1.25rem;
   margin: 0;
 }
 
@@ -68,13 +70,15 @@ main:has(> .practice-screen) {
 }
 
 .stat__bar {
-  width: 9rem;
+  width: min(9rem, 25vw);
   height: 10px;
   accent-color: var(--color-accent);
 }
 
 .practice-bar__tools {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
   gap: 0.75rem;
 }
@@ -372,7 +376,7 @@ main:has(> .practice-screen) {
 }
 
 .practice-finish__title {
-  font-size: 1.5em;
+  font-size: var(--text-xl);
   font-weight: 700;
   color: var(--color-correct);
 }

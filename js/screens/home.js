@@ -6,6 +6,7 @@ import { redirect } from '../router.js';
 import { profiles } from '../profiles.js';
 import { getLayout } from '../layouts/index.js';
 import { getCourse, lessonStates } from '../course.js';
+import { summarizeProgress } from '../progress-summary.js';
 import { createInstallButton } from '../pwa.js';
 
 const text = strings.home;
@@ -20,6 +21,8 @@ export function render(container) {
   }
 
   const continueLine = el('span', { class: 'home-action__description' }, text.lessonsDescription);
+  // How it is going, in a line (filled when the course loads; empty before the first lesson).
+  const stats = el('ul', { class: 'home-stats', 'aria-label': text.progress });
 
   container.append(
     el(
@@ -35,6 +38,15 @@ export function render(container) {
           { class: 'muted' },
           strings.picker.profileSummary(strings.modes[profile.mode], getLayout(profile.layoutId).name),
         ),
+        stats,
+      ),
+      // Always in view, next to the greeting.
+      el(
+        'nav',
+        { class: 'home-links', 'aria-label': strings.appName },
+        el('a', { href: '#/progreso' }, text.progress),
+        el('a', { href: '#/' }, text.switchProfile),
+        el('a', { href: `#/perfiles/${encodeURIComponent(profile.id)}/editar` }, text.editProfile),
       ),
     ),
     el(
@@ -53,13 +65,6 @@ export function render(container) {
         el('span', { class: 'home-action__description' }, text.freeTypingDescription),
       ),
     ),
-    el(
-      'nav',
-      { class: 'home-links', 'aria-label': strings.appName },
-      el('a', { href: '#/progreso' }, text.progress),
-      el('a', { href: '#/' }, text.switchProfile),
-      el('a', { href: `#/perfiles/${encodeURIComponent(profile.id)}/editar` }, text.editProfile),
-    ),
     el('div', { class: 'install-slot' }, createInstallButton()),
   );
 
@@ -72,6 +77,7 @@ export function render(container) {
       const states = lessonStates(course, profiles.progressFor(profile.id, profile.layoutId), profile.mode);
       const next = course.lessons.find((lesson) => states.get(lesson.id).recommended);
       continueLine.textContent = next ? text.continueWith(next.number, next.title) : text.courseDone;
+      stats.replaceChildren(...statItems(profile, summarizeProgress(profile, profile.layoutId, course)));
     },
     () => {}, // keep the generic description; the lessons screen explains load errors
   );
@@ -79,4 +85,14 @@ export function render(container) {
   return () => {
     left = true;
   };
+}
+
+// Kids: stars, medals and streak. Adults: speed, accuracy and streak. Nothing before the first session.
+function statItems(profile, summary) {
+  if (summary.avgAccuracy === null) return [];
+  const items = profile.mode === 'kids'
+    ? [text.stats.stars(summary.stars), text.stats.medals(Object.keys(profile.medals).length)]
+    : [summary.avgWpm === null ? null : text.stats.wpm(summary.avgWpm), text.stats.accuracy(summary.avgAccuracy)];
+  if (summary.streak > 0) items.push(text.stats.streak(summary.streak));
+  return items.filter(Boolean).map((item) => el('li', {}, item));
 }

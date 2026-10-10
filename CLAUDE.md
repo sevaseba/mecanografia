@@ -38,6 +38,7 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │   ├── dialog.js         # confirmación accesible con <dialog>
 │   ├── calibration-view.js # prueba opcional de teclado (tecla a la derecha de la L, etc.)
 │   ├── achievements.js   # racha de días, medallas y teclas con más errores
+│   ├── progress-summary.js # promedios, aprobadas, estrellas y racha de un curso (Mi progreso e inicio)
 │   ├── pwa.js            # registro del service worker, aviso de actualización, botón "Instalar app"
 │   ├── sound.js          # sonidos de acierto/error con Web Audio API
 │   ├── sound-toggle.js   # interruptor de sonido del perfil
@@ -106,7 +107,8 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 - El progreso va en `profile.progress[layoutId]`: un curso por distribución dentro del mismo perfil, con `keyStats` (errores e intentos por carácter). En el perfil: `settings` (sonido, voz, tema, `hands` = aspecto de las manos, `handsPlacement` = `below` | `over`) y `medals` (se guardan al ganarse). Esquema actual: versión 4.
 - Respaldo: `{ app: "mecanografia", type: "backup", exportedAt, data }`. Importar valida, migra y reemplaza todo previa confirmación.
 - Pantallas que cargan datos de forma asíncrona deben devolver una función de limpieza y descartar resultados que lleguen después de salir de la pantalla (si no, dibujan dentro de la pantalla siguiente).
-- `#/progreso` muestra "Mi progreso" (promedios de las últimas 10 sesiones de lecciones, racha, gráfico, teclas con más errores, medallas en infantil), con selector de distribución.
+- `#/progreso` muestra "Mi progreso" (promedios de las últimas 10 sesiones de lecciones, racha, gráfico, teclas con más errores, medallas en infantil, que van primero), con selector de distribución al lado del título.
+- `#/inicio` muestra una línea con los números (infantil: estrellas, medallas y racha; adulto: PPM, precisión y racha) y los enlaces (Mi progreso, cambiar y editar perfil) junto al saludo, siempre a la vista.
 - Pantallas: `#/` elegir perfil (y respaldo; mostrarla deja sin perfil activo), `#/perfiles/nuevo`, `#/perfiles/:id/editar`, `#/inicio` del perfil activo, `#/lecciones` (mapa), `#/lecciones/:id`, `#/posicion-de-las-manos`, `#/teclado-libre`. Las pantallas que necesitan un perfil activo redirigen a `#/`.
 - El modo (`data-mode` en `<html>`) y la distribución de la práctica salen del perfil activo.
 
@@ -148,6 +150,8 @@ Teclado libre y lecciones usan `practice-view.js`. Reglas de diseño:
 - Módulos ES nativos (`import`/`export`), sin variables globales.
 - Los textos de la interfaz se centralizan (por ejemplo `js/strings.js`) para mantener consistencia del voseo.
 - CSS con custom properties para los temas; nada de estilos inline desde JS salvo valores dinámicos.
+- **Tamaños de letra:** solo los pasos de la escala de `themes.css` (`--text-sm` … `--text-display`, relativos a la base de cada modo; `h2` usa `--text-lg`). `--text-sm` es el texto más chico. Las excepciones son el teclado y la línea de texto (salen del tamaño de tecla), la barra compacta de la práctica e íconos/emojis.
+- Pantallas sin scroll en 1366×641 cuando se pueda (inicio, elegir perfil, resultados: la acción siguiente siempre a la vista); en celular, nunca scroll horizontal (un `fieldset` necesita `min-width: 0`).
 - Para identificar teclas físicas se usa `KeyboardEvent.code`. El carácter producido se toma de los eventos `input`/`compositionend` de un textarea oculto (no de `keydown`), porque ahí el sistema ya compuso las teclas muertas (´ + a → á). Ver `input.js`.
 - El formato de los archivos de distribución está documentado al principio de `js/layouts/es-latam.js`.
 - `navigator.keyboard.getLayoutMap()` (solo Chromium) devuelve únicamente la capa base, y las teclas muertas como su carácter de espaciado (`BracketLeft` → `´` en es-latam), nunca `"Dead"`. Verificado en Chrome 153 / Windows.

@@ -29,8 +29,8 @@ export function render(container) {
   }
 
   const children = [
-    el('h1', {}, text.title),
-    list.length === 0 ? el('p', { class: 'lead' }, strings.picker.welcome) : null,
+    el('h1', { class: 'picker-title' }, text.title),
+    list.length === 0 ? el('p', { class: 'lead picker-title' }, strings.picker.welcome) : null,
     storageWarning(),
     el(
       'ul',
@@ -158,10 +158,11 @@ function backupSection(profileCount, status, onImported) {
     onImported(backupText.imported(data.profiles.length));
   });
 
+  // Rarely used, so closed and at the bottom: the screen is the family's way in.
   return el(
-    'section',
-    { class: 'backup', 'aria-labelledby': 'backup-title' },
-    el('h2', { id: 'backup-title' }, backupText.title),
+    'details',
+    { class: 'backup' },
+    el('summary', {}, backupText.title),
     el('p', { class: 'muted' }, backupText.description),
     el(
       'div',

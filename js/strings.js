@@ -57,6 +57,7 @@ export const strings = {
   profileForm: {
     newTitle: 'Nuevo perfil',
     editTitle: 'Editar perfil',
+    groups: { who: 'Quién practica', look: 'Cómo se ve', keyboard: 'Teclado' },
     nameLabel: 'Nombre',
     avatarLabel: 'Elegí un avatar',
     modeLabel: 'Modo',
@@ -108,18 +109,7 @@ export const strings = {
   encouragement: {
     exerciseDone: ['¡Bien!', '¡Muy bien!', '¡Genial!', '¡Así se hace!', '¡Bárbaro!', '¡Excelente!'],
     passed: ['¡Lo lograste!', '¡Sos una máquina!', '¡Qué bien escribiste!', '¡Increíble!', '¡Lección superada!'],
-    passedMessage: [
-      'Tus dedos están aprendiendo un montón.',
-      'Cada día escribís mejor.',
-      '¡Seguí así y vas a escribir rapidísimo!',
-      'Tus manos ya conocen estas teclas.',
-    ],
     retry: ['¡Vas muy bien!', '¡Buen intento!', '¡Seguí practicando!', '¡Ya casi lo tenés!'],
-    retryMessage: [
-      'Probemos otra vez, despacito, para ganar una estrella.',
-      'Mirá las manos de la pantalla y probá de nuevo.',
-      'Sin apuro: lo importante es apretar la tecla justa.',
-    ],
   },
 
   medals: {
@@ -154,6 +144,7 @@ export const strings = {
     description: 'Tus números de las últimas sesiones de lecciones.',
     layoutLabel: 'Distribución',
     avgWpm: 'PPM promedio',
+    avgWpmKids: 'Palabras por minuto',
     avgWpmHint: 'últimas 10 sesiones',
     avgAccuracy: 'Precisión promedio',
     lessonsPassed: 'Lecciones aprobadas',
@@ -161,6 +152,7 @@ export const strings = {
     streakDays: (days) => `${days} ${days === 1 ? 'día' : 'días'}`,
     streakHint: 'seguidos, practicando',
     chartTitle: 'Evolución de las PPM',
+    chartTitleKids: 'Tu velocidad',
     chartSummary: (count, min, max, last) =>
       `PPM en las últimas ${count} sesiones: mínimo ${min}, máximo ${max}, última ${last}.`,
     chartAxisSessions: 'Sesiones',
@@ -222,6 +214,13 @@ export const strings = {
     freeTypingDescription: 'Escribí textos de prueba con la guía del teclado y las manos.',
     switchProfile: 'Cambiar de perfil',
     editProfile: 'Editar mi perfil',
+    stats: {
+      wpm: (wpm) => `${wpm} PPM`,
+      accuracy: (accuracy) => `${accuracy} % de precisión`,
+      stars: (count) => `★ ${count} ${count === 1 ? 'estrella' : 'estrellas'}`,
+      medals: (count) => `🏅 ${count} ${count === 1 ? 'medalla' : 'medallas'}`,
+      streak: (days) => `🔥 ${days} ${days === 1 ? 'día' : 'días seguidos'}`,
+    },
   },
 
   lessons: {
@@ -235,11 +234,12 @@ export const strings = {
     newKeysLabel: 'Teclas nuevas',
     review: 'Repaso',
     status: {
-      locked: 'Bloqueada: primero aprobá la anterior',
+      locked: 'Bloqueada',
       available: 'Disponible',
       completed: 'Aprobada',
     },
     recommended: 'Seguí acá',
+    lockedHint: 'Aprobá cada lección para abrir la siguiente.',
     stars: (count) => `${count} de 3 estrellas`,
     exerciseCounter: (current, total) => `Ejercicio ${current} de ${total}`,
     restartLesson: 'Empezar de nuevo',
