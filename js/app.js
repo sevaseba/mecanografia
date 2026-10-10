@@ -40,4 +40,5 @@ darkScheme.addEventListener('change', applyActiveProfile);
 applyActiveProfile();
 
 startRouter(document.getElementById('app'), routes, notFoundScreen);
-registerServiceWorker();
+// Data saved by a newer version (read-only here): this copy is out of date, update right away.
+registerServiceWorker({ outdated: !profiles.canSave });

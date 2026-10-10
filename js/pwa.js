@@ -8,7 +8,12 @@ import { announce } from './announcer.js';
 let deferredInstallPrompt = null;
 const installListeners = new Set();
 
-export async function registerServiceWorker() {
+/**
+ * @param {object} [options]
+ * @param {boolean} [options.outdated]  the saved data comes from a newer version of the app, so
+ *   this one cannot save anything: install the new version as soon as it is ready, without asking.
+ */
+export async function registerServiceWorker({ outdated = false } = {}) {
   if (!('serviceWorker' in navigator)) return;
 
   const isFirstInstall = !navigator.serviceWorker.controller;
@@ -26,23 +31,27 @@ export async function registerServiceWorker() {
   }
 
   // A new version waits until the user accepts it, so nothing changes mid-lesson.
-  if (registration.waiting) showUpdateBanner(registration.waiting);
+  const onUpdate = outdated ? applyUpdate : showUpdateBanner;
+  if (registration.waiting) onUpdate(registration.waiting);
   registration.addEventListener('updatefound', () => {
     const worker = registration.installing;
     worker?.addEventListener('statechange', () => {
-      if (worker.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner(worker);
+      if (worker.state === 'installed' && navigator.serviceWorker.controller) onUpdate(worker);
     });
   });
+}
+
+/** Activates the waiting version and reloads the page with it. */
+function applyUpdate(worker) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => location.reload(), { once: true });
+  worker.postMessage({ type: 'skip-waiting' });
 }
 
 function showUpdateBanner(worker) {
   if (document.querySelector('.update-banner')) return;
   const button = el('button', { type: 'button', class: 'button button--small' }, strings.pwa.update);
   const banner = el('div', { class: 'update-banner', role: 'status' }, el('p', {}, strings.pwa.updateAvailable), button);
-  button.addEventListener('click', () => {
-    navigator.serviceWorker.addEventListener('controllerchange', () => location.reload(), { once: true });
-    worker.postMessage({ type: 'skip-waiting' });
-  });
+  button.addEventListener('click', () => applyUpdate(worker));
   document.body.append(banner);
 }
 
