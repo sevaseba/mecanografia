@@ -50,3 +50,11 @@
 - Después de verificar con el service worker limpio, repetir la prueba de lo que toque audio, video o caché con el service worker activo, como lo usa la familia.
 - El service worker responde 206 a los pedidos con `Range` (función `partial` en `sw.js`).
 - Al publicar algo nuevo, recordarle al usuario que toque "Actualizar" en el aviso.
+
+## 2026-10-10 — "Cancelar" en Editar perfil daba 404
+
+**Qué pasó:** el enlace usaba la ruta del router sin `#` (`href: '/inicio'`), así que el navegador salía de la app hacia `/inicio` en el servidor. `navigate()` agrega el `#` solo, pero un `href` no; y en localhost el 404 también aparece, solo que nadie probó ese botón.
+
+**Reglas:**
+- Todo `href` interno empieza con `#/` (buscar `href:` en `js/` al agregar enlaces).
+- Al verificar un formulario, probar también los botones secundarios (Cancelar, Volver), no solo el envío.

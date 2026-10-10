@@ -124,7 +124,7 @@ export function render(container, params) {
       'div',
       { class: 'form-actions' },
       el('button', { type: 'submit', class: 'button' }, editing ? text.save : text.create),
-      el('a', { class: 'button button--secondary', href: backPath() }, text.cancel),
+      el('a', { class: 'button button--secondary', href: `#${backPath()}` }, text.cancel),
     ),
   );
 
