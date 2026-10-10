@@ -3,7 +3,7 @@
 // files to PRECACHE. Lesson files and voice clips are not listed: they are read from each
 // course index.json and from the voice index.
 
-const CACHE_VERSION = 'v31';
+const CACHE_VERSION = 'v32';
 const CACHE_NAME = `mecanografia-${CACHE_VERSION}`;
 
 const PRECACHE = [
@@ -135,5 +135,27 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  event.respondWith(caches.match(request).then((cached) => cached ?? fetch(request)));
+  // Audio is requested in byte ranges, and some browsers (Safari) only play a 206 answer.
+  const range = request.headers.get('range');
+  event.respondWith(
+    caches.match(request).then((cached) => (cached ? (range ? partial(cached, range) : cached) : fetch(request))),
+  );
 });
+
+/** The part of a cached response that a Range header asks for ("bytes=0-", "bytes=10-99", "bytes=-500"). */
+async function partial(response, range) {
+  const body = await response.arrayBuffer();
+  const size = body.byteLength;
+  const [, start = '', end = ''] = /^bytes=(\d*)-(\d*)$/.exec(range.trim()) ?? [];
+  let from = start === '' ? size - Number(end) : Number(start);
+  let to = start !== '' && end !== '' ? Number(end) : size - 1;
+  from = Math.max(0, from);
+  to = Math.min(to, size - 1);
+  if ((start === '' && end === '') || from > to) {
+    return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${size}` } });
+  }
+  const headers = new Headers(response.headers);
+  headers.set('Content-Range', `bytes ${from}-${to}/${size}`);
+  headers.set('Content-Length', String(to - from + 1));
+  return new Response(body.slice(from, to + 1), { status: 206, statusText: 'Partial Content', headers });
+}

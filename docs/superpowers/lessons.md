@@ -41,3 +41,12 @@
 **Reglas:**
 - Después de tocar cualquier módulo, correr `node --check` sobre todos los `.js` (detecta errores de sintaxis como declaraciones repetidas), no solo `node --test`.
 - Si una pantalla queda en blanco sin errores, probar `await import('/js/…')` desde la consola: muestra el error de carga del módulo.
+
+## 2026-10-10 — "No tiene audio" en GitHub Pages
+
+**Qué pasó:** el audio solo se había probado con el service worker desregistrado. Con la app instalada, el service worker respondía los pedidos de audio por partes (`Range`) con el archivo entero (200), y Safari no reproduce eso. Además, en el navegador del usuario seguía activa la versión vieja, esperando que tocara "Actualizar".
+
+**Reglas:**
+- Después de verificar con el service worker limpio, repetir la prueba de lo que toque audio, video o caché con el service worker activo, como lo usa la familia.
+- El service worker responde 206 a los pedidos con `Range` (función `partial` en `sw.js`).
+- Al publicar algo nuevo, recordarle al usuario que toque "Actualizar" en el aviso.
