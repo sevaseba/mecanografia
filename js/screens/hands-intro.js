@@ -9,6 +9,7 @@ import { createKeyIndex } from '../keystrokes.js';
 import { markIntroDone } from '../hands-intro.js';
 import { createHandsIntroView } from '../hands-intro-view.js';
 import { createVoiceToggle } from '../sound-toggle.js';
+import { handsOf } from '../hand-skins.js';
 
 const text = strings.handsIntro;
 
@@ -25,7 +26,7 @@ export function render(container) {
     keyIndex: createKeyIndex(getLayout(profile.layoutId)),
     backHref: '#/lecciones',
     finishLabel: text.backToMap,
-    ...voiceOptions(profile),
+    ...introOptions(profile),
     onDone: () => {
       saveIntroDone(profile);
       navigate('/lecciones');
@@ -36,13 +37,15 @@ export function render(container) {
   return view.destroy;
 }
 
-/** Voice switch (kids only) and setting for the intro, shared with the lesson screen. */
-export function voiceOptions(profile) {
+/** Profile options for the intro (voice, hands), shared with the lesson screen. */
+export function introOptions(profile) {
   const voiceToggle = createVoiceToggle(profile.id);
   voiceToggle.classList.add('only-kids');
   return {
     tools: [voiceToggle],
     voiceEnabled: () => profiles.get(profile.id)?.settings.voice ?? false,
+    hands: handsOf(profiles.get(profile.id)),
+    onHandsChange: (settings) => profiles.updateSettings(profile.id, settings),
   };
 }
 

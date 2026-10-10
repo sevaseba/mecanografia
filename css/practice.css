@@ -142,23 +142,52 @@ main:has(> .practice-screen) {
 
   --stage-gap: 12px;
   --line-h: 4.5rem;
-  --hands-h: 7.5rem;
+  --hands-units: 2.2;
   --cue-h: 1.5rem;
-  /* Keyboard is 16.6 units wide and 5.6 units tall (keys + gaps + padding). */
+  /* Keyboard is 16.6 units wide and 5.6 units tall (keys + gaps + padding); the hands take
+     --hands-units more under it (below it, or the palms when they rest on it). */
   --unit: min(
     calc((100cqw - 32px) / 16.6),
-    calc((100cqh - var(--line-h) - var(--hands-h) - var(--cue-h) - 5 * var(--stage-gap)) / 5.6)
+    calc((100cqh - var(--line-h) - var(--cue-h) - 4 * var(--stage-gap)) / (5.6 + var(--hands-units)))
   );
   --gap: calc(var(--unit) * 0.1);
   --board-w: calc(16.6 * var(--unit));
-  --hand-w: calc(var(--hands-h) * 200 / 210);
 }
 
 /* Kids: a shorter text row and hands leave more height to the keyboard (bigger keys). */
 [data-mode="kids"] .practice-stage {
   --line-h: 4.2rem;
-  --hands-h: 4.2rem;
+  --hands-units: 2;
   --cue-h: 0px;
+}
+
+/* Keyboard + hands. Over the keyboard, the hands cover it (palms and wrists hang below and
+   are cut where the room ends); below it, they sit in the room left under it. */
+.keyboard-board {
+  position: relative;
+  flex: none;
+  width: var(--board-w);
+  height: calc((5.6 + var(--hands-units)) * var(--unit));
+  /* Cut only at the bottom: pulsing keys may grow a little past the other edges. */
+  clip-path: inset(-1rem -1rem 0 -1rem);
+}
+
+.keyboard-board .hands {
+  position: absolute;
+  display: block;
+}
+
+.keyboard-board .hands[data-placement="over"] {
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.keyboard-board .hands[data-placement="below"] {
+  bottom: 0;
+  left: 50%;
+  height: calc(var(--hands-units) * var(--unit));
+  transform: translateX(-50%);
 }
 
 /* Text line (+ kids card): directly above the keyboard, same width. */

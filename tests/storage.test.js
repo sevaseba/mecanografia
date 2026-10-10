@@ -28,7 +28,7 @@ const profile = (overrides = {}) => ({
   createdAt: '2026-10-08T00:00:00.000Z',
   updatedAt: '2026-10-08T00:00:00.000Z',
   progress: {},
-  settings: { sound: false, voice: true, theme: 'auto' },
+  settings: { sound: false, voice: true, theme: 'auto', hands: 'tone-3', handsPlacement: 'below' },
   medals: {},
   ...overrides,
 });
@@ -140,24 +140,31 @@ test('migrates version 1 documents: adds settings and medals', () => {
   const v1 = { version: 1, activeProfileId: 'p1', profiles: [profile({ settings: undefined, medals: undefined })] };
   const data = createStore(memoryBackend({ [STORAGE_KEY]: JSON.stringify(v1) })).read();
   assert.equal(data.version, SCHEMA_VERSION);
-  assert.deepEqual(data.profiles[0].settings, { sound: false, voice: true, theme: 'auto' });
+  assert.deepEqual(data.profiles[0].settings, { sound: false, voice: true, theme: 'auto', hands: 'tone-3', handsPlacement: 'below' });
   assert.deepEqual(data.profiles[0].medals, {});
 });
 
 test('migrates version 2 documents: the voice is on, other settings are kept', () => {
   const v2 = { version: 2, activeProfileId: 'p1', profiles: [profile({ settings: { sound: true, theme: 'dark' } })] };
   const data = createStore(memoryBackend({ [STORAGE_KEY]: JSON.stringify(v2) })).read();
-  assert.equal(data.version, 3);
-  assert.deepEqual(data.profiles[0].settings, { sound: true, voice: true, theme: 'dark' });
+  assert.equal(data.version, 4);
+  assert.deepEqual(data.profiles[0].settings, { sound: true, voice: true, theme: 'dark', hands: 'tone-3', handsPlacement: 'below' });
+});
+
+test('migrates version 3 documents: default hands below the keyboard, other settings kept', () => {
+  const v3 = { version: 3, activeProfileId: 'p1', profiles: [profile({ settings: { sound: true, voice: false, theme: 'light' } })] };
+  const data = createStore(memoryBackend({ [STORAGE_KEY]: JSON.stringify(v3) })).read();
+  assert.equal(data.version, 4);
+  assert.deepEqual(data.profiles[0].settings, { sound: true, voice: false, theme: 'light', hands: 'tone-3', handsPlacement: 'below' });
 });
 
 test('normalizes settings and medals', () => {
   const stored = {
     version: 3,
     activeProfileId: null,
-    profiles: [profile({ settings: { sound: 'yes', voice: 'no', theme: 'neon' }, medals: { a: 'T1', b: 5 } })],
+    profiles: [profile({ settings: { sound: 'yes', voice: 'no', theme: 'neon', hands: 'dragon', handsPlacement: 'left' }, medals: { a: 'T1', b: 5 } })],
   };
   const data = createStore(memoryBackend({ [STORAGE_KEY]: JSON.stringify(stored) })).read();
-  assert.deepEqual(data.profiles[0].settings, { sound: false, voice: true, theme: 'auto' });
+  assert.deepEqual(data.profiles[0].settings, { sound: false, voice: true, theme: 'auto', hands: 'tone-3', handsPlacement: 'below' });
   assert.deepEqual(data.profiles[0].medals, { a: 'T1' });
 });

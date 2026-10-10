@@ -1,11 +1,12 @@
 // Persistent app data: one versioned JSON document in localStorage.
 //
 // {
-//   version: 3,
+//   version: 4,
 //   activeProfileId: string | null,
 //   profiles: [{
 //     id, name, avatar, mode: 'kids' | 'adult', layoutId, createdAt, updatedAt,
-//     settings: { sound: boolean, voice: boolean, theme: 'auto' | 'light' | 'dark' },
+//     settings: { sound: boolean, voice: boolean, theme: 'auto' | 'light' | 'dark',
+//                 hands: skin id (hand-skins.js), handsPlacement: 'below' | 'over' },
 //     medals: { [medalId]: ISO date earned },
 //     progress: { [layoutId]: object }   // one course progress per layout (see course.js)
 //   }]
@@ -15,9 +16,10 @@
 // To change the shape: bump SCHEMA_VERSION and add MIGRATIONS[oldVersion].
 
 import { getLayout, defaultLayoutId } from './layouts/index.js';
+import { HAND_SKINS, DEFAULT_SKIN, HAND_PLACEMENTS, DEFAULT_PLACEMENT } from './hand-skins.js';
 
 export const STORAGE_KEY = 'mecanografia';
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 // MIGRATIONS[n] turns a version-n document into a version-(n + 1) one.
 const MIGRATIONS = {
@@ -33,13 +35,22 @@ const MIGRATIONS = {
     version: 3,
     profiles: (document.profiles ?? []).map((profile) => ({ ...profile, settings: { ...profile.settings, voice: true } })),
   }),
+  // v4: the look of the hands and where they are drawn.
+  3: (document) => ({
+    ...document,
+    version: 4,
+    profiles: (document.profiles ?? []).map((profile) => ({
+      ...profile,
+      settings: { ...profile.settings, hands: DEFAULT_SKIN, handsPlacement: DEFAULT_PLACEMENT },
+    })),
+  }),
 };
 
 const MODES = ['kids', 'adult'];
 const THEMES = ['auto', 'light', 'dark'];
 
 export function defaultSettings() {
-  return { sound: false, voice: true, theme: 'auto' };
+  return { sound: false, voice: true, theme: 'auto', hands: DEFAULT_SKIN, handsPlacement: DEFAULT_PLACEMENT };
 }
 const NAME_MAX_LENGTH = 30;
 const BACKUP_APP = 'mecanografia';
@@ -189,6 +200,8 @@ function normalizeSettings(settings) {
     sound: typeof settings.sound === 'boolean' ? settings.sound : defaults.sound,
     voice: typeof settings.voice === 'boolean' ? settings.voice : defaults.voice,
     theme: THEMES.includes(settings.theme) ? settings.theme : defaults.theme,
+    hands: HAND_SKINS.some(({ id }) => id === settings.hands) ? settings.hands : defaults.hands,
+    handsPlacement: HAND_PLACEMENTS.includes(settings.handsPlacement) ? settings.handsPlacement : defaults.handsPlacement,
   };
 }
 

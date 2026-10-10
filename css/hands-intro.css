@@ -8,6 +8,16 @@
   --cue-h: 0px;
 }
 
+/* First step: room for the finger colors and the hands picker. */
+.practice-stage.hands-intro.is-choosing {
+  --line-h: 11.5rem;
+}
+
+.hands-intro .hands-picker {
+  margin-top: 0.4em;
+  font-size: 0.85em;
+}
+
 .hands-intro__panel {
   position: relative;
   flex: none;

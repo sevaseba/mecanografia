@@ -32,7 +32,8 @@ import { launchConfetti } from '../confetti.js';
 import { pickOne } from '../random.js';
 import { isIntroDone } from '../hands-intro.js';
 import { createHandsIntroView } from '../hands-intro-view.js';
-import { saveIntroDone, voiceOptions } from './hands-intro.js';
+import { saveIntroDone, introOptions } from './hands-intro.js';
+import { handsOf } from '../hand-skins.js';
 import { createVoice } from '../voice.js';
 
 const text = strings.lessons;
@@ -79,7 +80,7 @@ export function render(container, params) {
       keyIndex: keyIndexes.find((index) => index.layout.id === profile.layoutId),
       backHref: '#/lecciones',
       finishLabel: strings.handsIntro.startLesson,
-      ...voiceOptions(profile),
+      ...introOptions(profile),
       onDone: () => {
         saveIntroDone(profile);
         intro.destroy();
@@ -116,6 +117,7 @@ export function render(container, params) {
       keyIndexes,
       tools: [counter, soundToggle, restartButton],
       soundEnabled: () => profiles.get(profile.id)?.settings.sound ?? false,
+      hands: handsOf(profiles.get(profile.id)),
       onFinish: (session) => {
         sessions.push(session);
         pauseTimer = setTimeout(() => {

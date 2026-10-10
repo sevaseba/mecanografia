@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es-AR" data-mode="adult" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>Prototipo de manos</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/themes.css">
+  <link rel="stylesheet" href="../css/keyboard.css">
+  <link rel="stylesheet" href="../css/hands.css">
+  <style>
+    body { margin: 0; }
+    .proto { padding: 16px; --unit: 72px; --gap: calc(var(--unit) * 0.1); }
+    .proto__controls { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; font-size: 16px; }
+    .proto__controls button { padding: 2px 10px; }
+    .board { position: relative; width: max-content; margin-bottom: calc(2 * var(--unit)); }
+    .board:has(.hands[data-placement="below"]) { margin-bottom: 0; }
+
+    .board .hands[data-placement="over"] { position: absolute; top: 0; left: 0; width: 100%; }
+    .board .hands[data-placement="below"] { display: block; width: 100%; }
+  </style>
+</head>
+<body>
+  <div class="proto">
+    <div class="proto__controls" id="controls"></div>
+    <div class="board" id="board"></div>
+  </div>
+  <script type="module">
+    import { getLayout } from '../js/layouts/index.js';
+    import { createKeyIndex } from '../js/keystrokes.js';
+    import { createKeyboardView } from '../js/keyboard-view.js';
+    import { createHandsView } from '../js/hands-view.js';
+    import { guideFor } from '../js/guidance.js';
+    import { HAND_SKINS } from '../js/hand-skins.js';
+
+    const params = new URLSearchParams(location.search);
+    const keyIndex = createKeyIndex(getLayout(params.get('layout') ?? 'es-latam'));
+    const keyboard = createKeyboardView(keyIndex.layout);
+    const hands = createHandsView(keyIndex, { placement: 'over' });
+    document.getElementById('board').append(keyboard.element, hands.element);
+
+    const show = (char) => {
+      const { targets } = guideFor(keyIndex, char, false);
+      keyboard.show(targets);
+      hands.show(targets);
+    };
+    window.showChar = show;
+
+    const controls = document.getElementById('controls');
+    for (const char of ['', 'f', 'j', 'r', 'u', 'g', 'h', 't', 'y', 'q', 'p', 'z', 'm', 'v', '4', '7', '1', '0', 'A', 'Ñ', ' ', '@', 'á']) {
+      const button = document.createElement('button');
+      button.textContent = char === '' ? 'reposo' : char === ' ' ? 'espacio' : char;
+      button.addEventListener('click', () => show(char === '' ? undefined : char));
+      controls.append(button);
+    }
+
+    // Demo: "types" a sentence on its own, one character every DEMO_MS.
+    const DEMO_TEXT = 'Hola, Sofía: ¿jugamos al fútbol mañana? ¡Dale!';
+    const DEMO_MS = 550;
+    let demoTimer = null;
+    const demoButton = document.createElement('button');
+    demoButton.textContent = '▶ Demo';
+    demoButton.addEventListener('click', () => {
+      clearInterval(demoTimer);
+      let i = 0;
+      demoTimer = setInterval(() => {
+        if (i === DEMO_TEXT.length) {
+          clearInterval(demoTimer);
+          show(undefined);
+          return;
+        }
+        show(DEMO_TEXT[i]);
+        i += 1;
+      }, DEMO_MS);
+    });
+    controls.prepend(demoButton);
+
+    // Skin picker.
+    const skins = document.createElement('div');
+    skins.className = 'proto__controls';
+    for (const skin of HAND_SKINS) {
+      const button = document.createElement('button');
+      button.textContent = skin.icon;
+      button.addEventListener('click', () => hands.setSkin(skin));
+      skins.append(button);
+    }
+    controls.after(skins);
+
+    // Placement picker: on the keyboard or below it.
+    const places = document.createElement('div');
+    places.className = 'proto__controls';
+    for (const [placement, label] of [['over', 'Sobre el teclado'], ['below', 'Abajo del teclado']]) {
+      const button = document.createElement('button');
+      button.textContent = label;
+      button.addEventListener('click', () => hands.setPlacement(placement));
+      places.append(button);
+    }
+    skins.after(places);
+    window.setSkin = (id) => hands.setSkin(HAND_SKINS.find((skin) => skin.id === id));
+  </script>
+</body>
+</html>

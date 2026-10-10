@@ -1,0 +1,228 @@
+/* Hands drawn with the on-screen keyboard (hands-view.js) and their picker (hands-picker.js).
+   The drawing is in key units; .keyboard-board (practice.css) sizes and places it. */
+
+.hands {
+  pointer-events: none;
+  overflow: visible;
+  --skin-line: var(--skin-edge);
+  --skin-crease: color-mix(in srgb, var(--skin-line) 45%, transparent);
+}
+
+/* On a dark keyboard, lines are drawn in a light version of the skin so they always show. */
+[data-theme="dark"] .hands {
+  --skin-line: color-mix(in srgb, var(--skin) 55%, white);
+}
+
+/* --- Looks (hand-skins.js says how each one is drawn) --- */
+
+.hands[data-skin="tone-1"] { --skin: #f6d5c0; --skin-edge: #b57f60; }
+.hands[data-skin="tone-2"] { --skin: #ecbc98; --skin-edge: #9c6440; }
+.hands[data-skin="tone-3"] { --skin: #cf9467; --skin-edge: #80502e; }
+.hands[data-skin="tone-4"] { --skin: #9a643e; --skin-edge: #5c3418; }
+.hands[data-skin="tone-5"] { --skin: #5e3b25; --skin-edge: #2e1a0c; }
+.hands[data-skin="web"] { --skin: #d7263d; --skin-edge: #7d0d1c; --skin-pattern: #1d3f8f; --skin-dark: #111827; }
+.hands[data-skin="armor"] { --skin: #b81d2a; --skin-edge: #5e0a12; --skin-accent: #f2b632; --skin-glow: #9ff0ff; }
+.hands[data-skin="tiger"] { --skin: #f08a24; --skin-edge: #7a3d07; --skin-dark: #1c1208; }
+.hands[data-skin="sparkle"] { --skin: #b04fd6; --skin-edge: #5d1d78; --skin-accent: #f7c948; }
+.hands[data-skin="robot"] { --skin: #a9b6c3; --skin-edge: #3c4753; --skin-dark: #3c4753; --skin-glow: #4ade80; }
+.hands[data-skin="monster"] { --skin: #54c45e; --skin-edge: #1f7a2c; }
+
+/* --- Hand and fingers --- */
+
+/* The skin is painted opaque inside its group and the group is faded as one piece, so
+   overlapping parts do not get darker. On the keyboard it is very see-through. */
+.hands__skin { opacity: 0.07; }
+.hands__skin--active { opacity: 0.18; }
+/* Costumes are recognized by their drawings: a bit more color than plain skin. */
+.hands:not([data-skin^="tone-"]) .hands__skin { opacity: 0.12; }
+.hands[data-skin="tiger"] .hands__skin { opacity: 0.18; }
+
+.hands__finger-body,
+.hands__palm {
+  fill: var(--skin);
+}
+
+.hands__finger-outline,
+.hands__palm-edge {
+  fill: none;
+  stroke: var(--skin-line);
+  stroke-width: 0.05;
+  stroke-opacity: 0.5;
+}
+
+.hands__crease {
+  fill: none;
+  stroke: var(--skin-crease);
+  stroke-width: 0.04;
+  stroke-linecap: round;
+}
+
+/* Nails carry the finger's color (kids instructions name fingers by color). */
+.hands__nail {
+  fill-opacity: 0.4;
+  stroke: rgb(0 0 0 / 0.15);
+  stroke-width: 0.03;
+}
+
+.hands__finger[data-finger-group="5"] .hands__nail { fill: var(--finger-5-strong); }
+.hands__finger[data-finger-group="4"] .hands__nail { fill: var(--finger-4-strong); }
+.hands__finger[data-finger-group="3"] .hands__nail { fill: var(--finger-3-strong); }
+.hands__finger[data-finger-group="2"] .hands__nail { fill: var(--finger-2-strong); }
+.hands__finger[data-finger-group="thumb"] .hands__nail { fill: var(--finger-thumb-strong); }
+
+.hands__hand {
+  transition: opacity 150ms;
+}
+
+/* A hand with nothing to do fades, so the eye goes to the other one. */
+.hands__hand.is-idle {
+  opacity: 0.4;
+}
+
+.hands__finger:is([data-role="primary"], [data-role="modifier"]) .hands__finger-outline {
+  stroke: var(--color-text);
+  stroke-width: 0.09;
+  stroke-opacity: 1;
+}
+
+.hands__finger[data-role="secondary"] .hands__finger-outline {
+  stroke: var(--color-text);
+  stroke-opacity: 0.8;
+  stroke-dasharray: 0.15 0.1;
+}
+
+/* Below the keyboard nothing is hidden: solid hands, as in a drawing. */
+.hands[data-placement="below"] .hands__skin { opacity: 0.9; }
+.hands[data-placement="below"] .hands__skin--active { opacity: 1; }
+.hands[data-placement="below"] .hands__nail { fill-opacity: 1; }
+.hands[data-placement="below"] :is(.hands__finger-outline, .hands__palm-edge) { stroke-opacity: 0.9; }
+
+/* --- Costume drawings: see-through too, so on the keyboard the letters always show --- */
+
+.hands .hand-skin { opacity: 0.4; }
+.hands[data-placement="below"] .hand-skin { opacity: 0.8; }
+
+.hand-skin__line { fill: none; stroke: var(--skin-line); stroke-width: 0.045; stroke-linecap: round; }
+.hands:is([data-skin="armor"], [data-skin="robot"]) .hand-skin__line { stroke-width: 0.025; }
+.hand-skin__pattern { fill: none; stroke: var(--skin-pattern); stroke-width: 0.02; stroke-linecap: round; }
+.hand-skin__pattern--thick { stroke: var(--skin-dark); stroke-width: 0.03; }
+.hand-skin__dark { fill: var(--skin-dark); opacity: 0.85; }
+.hand-skin__band { fill: var(--skin-accent); stroke: var(--skin-edge); stroke-width: 0.02; }
+.hand-skin__accent { fill: none; stroke: var(--skin-accent); stroke-width: 0.07; }
+.hand-skin__glow { fill: var(--skin-glow); opacity: 0.35; }
+.hand-skin__light { fill: var(--skin-glow); stroke: var(--skin-edge); stroke-width: 0.02; }
+.hand-skin__trace { fill: none; stroke: var(--skin-glow); stroke-width: 0.03; stroke-linecap: round; stroke-linejoin: round; }
+.hand-skin__spot { fill: var(--skin-line); opacity: 0.45; }
+
+.hand-skin__sparkle {
+  fill: var(--skin-accent);
+  stroke: color-mix(in srgb, var(--skin-accent) 60%, black);
+  stroke-width: 0.015;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: twinkle 1.8s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  50% { opacity: 0.35; transform: scale(0.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hand-skin__sparkle { animation: none; }
+}
+
+/* --- Picker --- */
+
+.hands-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.hands-picker .field {
+  margin: 0;
+}
+
+.hands-picker__label {
+  font-weight: 600;
+}
+
+.hands-picker--compact .hands-picker__label {
+  white-space: nowrap;
+}
+
+.hands-picker__skins {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.5rem;
+  max-width: 40rem;
+}
+
+.hands-picker__placements {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(9rem, 1fr));
+  gap: 0.5rem;
+}
+
+.hand-option {
+  padding: 0.3rem 0.2rem;
+  text-align: center;
+}
+
+.hand-option__icon {
+  display: block;
+  font-size: 1.8rem;
+  line-height: 1.2;
+}
+
+.hand-option__name {
+  display: block;
+  font-size: 0.8em;
+}
+
+/* In the hands intro: icons only; the looks and the placement share a row when they fit. */
+.hands-picker--compact {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 1.2rem;
+}
+
+/* The question goes to the left of its options. */
+.hands-picker--compact .hands-picker__group {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hands-picker--compact .hands-picker__skins {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.3rem;
+  max-width: none;
+}
+
+.hands-picker--compact .hands-picker__skins .choice-tile {
+  width: 2.2rem;
+}
+
+.hands-picker--compact .hands-picker__placements {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.hands-picker--compact .hand-option {
+  padding: 0.1rem 0;
+}
+
+.hands-picker--compact .hand-option__icon {
+  font-size: 1.3rem;
+}
+
+.hands-picker--compact .hand-option__name {
+  display: none;
+}
+
+.hands-picker--compact .option-card {
+  padding: 0.3rem 0.75rem;
+}

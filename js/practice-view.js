@@ -3,8 +3,7 @@
 //   stats bar (back · title · PPM · accuracy · progress · screen tools)
 //   layout warning (only when needed)
 //   [kids: big current-char card] single scrolling text line
-//   on-screen keyboard
-//   hands (index fingers under F and J)
+//   on-screen keyboard with the hands (over it, or below it: the profile chooses)
 //   short finger cue (adult only)
 
 import { el } from './dom.js';
@@ -37,6 +36,7 @@ const MISS_SIGNAL_MS = 400;
  * @param {(layoutId: string) => void} [options.onLayoutSuggestion]  "use this layout" button
  * @param {(session: object) => void} [options.onFinish]  the current text was completed
  * @param {() => boolean} [options.soundEnabled]  play a sound for each right/wrong key
+ * @param {object} [options.hands]       look and placement of the hands (handsOf in hand-skins.js)
  */
 export function createPracticeView({
   title,
@@ -46,6 +46,7 @@ export function createPracticeView({
   onLayoutSuggestion,
   onFinish,
   soundEnabled = () => false,
+  hands: handsOptions,
 }) {
   const state = {
     keyIndex,
@@ -103,7 +104,8 @@ export function createPracticeView({
   const focusRow = el('div', { class: 'practice-focus' }, textarea, charCard, textLine.element, finishMessage, focusPrompt);
 
   const keyboard = createKeyboardView(keyIndex.layout);
-  const hands = createHandsView();
+  const hands = createHandsView(keyIndex, handsOptions);
+  const board = el('div', { class: 'keyboard-board' }, keyboard.element, hands.element);
   const fingerCue = el('p', { class: 'finger-cue only-adult', 'aria-hidden': 'true' });
   const srHint = el('p', { id: 'practice-sr-hint', class: 'visually-hidden' });
 
@@ -111,8 +113,7 @@ export function createPracticeView({
     'div',
     { class: 'practice-stage', onClick: () => textarea.focus() },
     focusRow,
-    keyboard.element,
-    hands.element,
+    board,
     fingerCue,
     srHint,
   );
@@ -188,6 +189,7 @@ export function createPracticeView({
   function setLayout(newKeyIndex) {
     state.keyIndex = newKeyIndex;
     keyboard.setLayout(newKeyIndex.layout);
+    hands.setLayout(newKeyIndex);
     inference.reset(newKeyIndex.layout.id);
     render();
   }

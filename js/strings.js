@@ -181,6 +181,27 @@ export const strings = {
     options: { auto: 'Automático (como el sistema)', light: 'Claro', dark: 'Oscuro' },
   },
 
+  // The hands drawn with the keyboard: their look and where they go.
+  hands: {
+    label: 'Tus manos',
+    kidsLabel: 'Elegí tus manos',
+    skins: {
+      'tone-1': 'Piel muy clara',
+      'tone-2': 'Piel clara',
+      'tone-3': 'Piel media',
+      'tone-4': 'Piel morena',
+      'tone-5': 'Piel oscura',
+      web: 'Telaraña',
+      armor: 'Armadura',
+      tiger: 'Tigre',
+      sparkle: 'Brillos',
+      robot: 'Robot',
+      monster: 'Monstruo',
+    },
+    placementLabel: 'Dónde se ven',
+    placements: { below: 'Abajo del teclado', over: 'Sobre el teclado' },
+  },
+
   pwa: {
     updateAvailable: 'Hay una actualización disponible.',
     update: 'Actualizar',

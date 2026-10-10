@@ -8,6 +8,7 @@ import { layouts } from '../layouts/index.js';
 import { createKeyIndex } from '../keystrokes.js';
 import { createPracticeView } from '../practice-view.js';
 import { createSoundToggle } from '../sound-toggle.js';
+import { handsOf } from '../hand-skins.js';
 
 const text = strings.freeTyping;
 const keyIndexes = layouts.map(createKeyIndex);
@@ -55,6 +56,7 @@ export function render(container) {
       restartButton,
     ],
     soundEnabled: () => profiles.get(profile.id)?.settings.sound ?? false,
+    hands: handsOf(profile),
     // "Use this layout" in the layout warning changes the profile's layout.
     onLayoutSuggestion: (layoutId) => {
       profiles.update(profile.id, { layoutId });

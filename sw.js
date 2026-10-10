@@ -3,7 +3,7 @@
 // files to PRECACHE. Lesson files and voice clips are not listed: they are read from each
 // course index.json and from the voice index.
 
-const CACHE_VERSION = 'v34';
+const CACHE_VERSION = 'v35';
 const CACHE_NAME = `mecanografia-${CACHE_VERSION}`;
 
 const PRECACHE = [
@@ -13,6 +13,7 @@ const PRECACHE = [
   './css/base.css',
   './css/themes.css',
   './css/keyboard.css',
+  './css/hands.css',
   './css/practice.css',
   './css/hands-intro.css',
   './css/profiles.css',
@@ -32,6 +33,9 @@ const PRECACHE = [
   './js/hands-intro-copy.js',
   './js/hands-intro-view.js',
   './js/hands-view.js',
+  './js/hand-skins.js',
+  './js/hands-picker.js',
+  './js/keyboard-geometry.js',
   './js/input.js',
   './js/keyboard-view.js',
   './js/keystrokes.js',

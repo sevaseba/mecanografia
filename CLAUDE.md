@@ -61,7 +61,10 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │   ├── practice-view.js  # pantalla de práctica (teclado libre y lecciones)
 │   ├── text-line-view.js # línea única de texto que se desplaza
 │   ├── keyboard-view.js  # teclado en pantalla con colores por dedo
-│   ├── hands-view.js     # manos en SVG (pictograma) con el dedo a usar iluminado
+│   ├── hands-view.js     # manos en SVG sobre el teclado o abajo; el dedo se estira hasta la tecla
+│   ├── hand-skins.js     # aspectos de las manos (tonos de piel y disfraces infantiles) y ubicaciones
+│   ├── hands-picker.js   # selector de aspecto y ubicación (perfil y paso 1 de la guía)
+│   ├── keyboard-geometry.js # centro de cada tecla en unidades de tecla, desde layout.rows
 │   └── layouts/
 │       ├── index.js      # registro de distribuciones disponibles
 │       ├── es-latam.js
@@ -100,7 +103,7 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 ## Datos y perfiles
 
 - Todo se guarda en **una** clave de localStorage, `mecanografia`, como documento JSON con `version` (esquema documentado al principio de `js/storage.js`). Para cambiar la forma: subir `SCHEMA_VERSION` y agregar `MIGRATIONS[versiónVieja]`; nunca leer ni escribir localStorage fuera de `storage.js`.
-- El progreso va en `profile.progress[layoutId]`: un curso por distribución dentro del mismo perfil, con `keyStats` (errores e intentos por carácter). En el perfil: `settings` (sonido, voz, tema) y `medals` (se guardan al ganarse). Esquema actual: versión 3.
+- El progreso va en `profile.progress[layoutId]`: un curso por distribución dentro del mismo perfil, con `keyStats` (errores e intentos por carácter). En el perfil: `settings` (sonido, voz, tema, `hands` = aspecto de las manos, `handsPlacement` = `below` | `over`) y `medals` (se guardan al ganarse). Esquema actual: versión 4.
 - Respaldo: `{ app: "mecanografia", type: "backup", exportedAt, data }`. Importar valida, migra y reemplaza todo previa confirmación.
 - Pantallas que cargan datos de forma asíncrona deben devolver una función de limpieza y descartar resultados que lleguen después de salir de la pantalla (si no, dibujan dentro de la pantalla siguiente).
 - `#/progreso` muestra "Mi progreso" (promedios de las últimas 10 sesiones de lecciones, racha, gráfico, teclas con más errores, medallas en infantil), con selector de distribución.
@@ -117,17 +120,26 @@ Guía interactiva que se muestra sola antes de la primera lección de cada curso
 - **Voz (solo infantil):** los textos de los chicos se leen con clips grabados con ElevenLabs y una voz rioplatense de su biblioteca (las voces genéricas sonaban a "yankee hablando español" y no pronunciaban el voseo). Las letras sueltas se leen por su nombre ("la efe"), ver `spokenText`. Interruptor "Voz" (`settings.voice`, prendido por defecto) y botón "Escuchar". Al terminar una lección, la voz también dice una frase corta sobre la próxima estrella, sin números (`strings.lessons.resultVoice`: puntería, velocidad, las dos, las tres estrellas o no aprobó).
   - Cada clip se llama como su frase (`voice-clips.js`), así las frases repetidas entre distribuciones comparten archivo. Solo se reproducen los clips listados en `assets/audio/kids/index.json`.
   - Al cambiar un texto infantil de la guía: `node tools/generate-voice.mjs` (necesita `ELEVENLABS_API_KEY` y `ELEVENLABS_VOICE_ID`; `--list` muestra qué falta sin grabar; `--force` regraba todo, por ejemplo al cambiar de voz) y subir `CACHE_VERSION`. El service worker guarda los clips leyendo ese index.json.
+- El paso 1 ("Tus dedos") incluye el selector de manos: lo elegido se ve al instante y se guarda en el perfil.
 - Al terminar o saltear se guarda `progress[layoutId].introCompletedAt`: es por distribución, como el resto del curso.
 
 ## Pantalla de práctica
 
 Teclado libre y lecciones usan `practice-view.js`. Reglas de diseño:
 - Todo entra en un viewport sin scroll; referencia mínima: notebook de 1366×768 (≈ 1366×641 útiles en Chrome). El tamaño de tecla sale del menor entre ancho y alto disponibles (container query units en `.practice-stage`).
-- Orden vertical: franja fina de estadísticas → (aviso de distribución) → línea de texto → teclado → manos → texto corto del dedo. Nada entre la línea de texto y el teclado.
+- Orden vertical: franja fina de estadísticas → (aviso de distribución) → línea de texto → teclado con las manos (`.keyboard-board`) → texto corto del dedo. Nada entre la línea de texto y el teclado.
 - Una sola línea de texto que se desplaza; lo escrito se desvanece a la izquierda.
 - La guía es gráfica: tecla y dedo en el color saturado de su dedo, con contorno y pulso. Mayús/Alt Gr: se iluminan los dos dedos. Tecla muerta: globitos 1 y 2. El texto del dedo es complementario y se oculta en modo infantil.
 - Modo infantil: tarjeta grande con el carácter actual a la izquierda de la línea; la franja solo muestra el progreso. Utilidades `.only-adult` / `.only-kids`.
 - Errores: en modo infantil la práctica no avanza hasta la tecla correcta (la tarjeta se sacude en rojo); en modo adulto avanza y el error queda marcado. Debajo de cada error se muestra lo que se escribió (`v` bajo `V`). La tecla presionada destella verde o roja en el teclado. El desvanecido de lo escrito es corto: las últimas ~10 letras se ven nítidas.
+
+## Manos
+
+`hands-view.js` dibuja dos manos desde la geometría de la distribución (cualquier distribución sirve). Cada perfil elige:
+- **Aspecto** (`settings.hands`, `hand-skins.js`): 5 tonos de piel para todos; en infantil, además, disfraces originales (Telaraña, Armadura, Tigre, Brillos, Robot, Monstruo), nunca copias de personajes. Los colores van en `css/hands.css`; los nombres en `strings.hands`. Un adulto con un disfraz guardado ve el tono por defecto (`skinFor`).
+- **Ubicación** (`settings.handsPlacement`): `below` (por defecto) en una franja debajo del teclado, sólidas, y el dedo en uso se inclina hacia su tecla; `over` apoyadas sobre el teclado, muy translúcidas (piel, uñas y dibujos), y el dedo se estira hasta la tecla. Nunca deben tapar las letras.
+- Las uñas llevan el color del dedo en todos los aspectos: las indicaciones infantiles nombran los dedos por color.
+- El tamaño sale de `--hands-units` (unidades de tecla bajo el teclado) en `practice.css`.
 
 ## Convenciones de código
 

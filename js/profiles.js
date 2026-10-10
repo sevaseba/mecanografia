@@ -3,6 +3,7 @@
 
 import { createStore, defaultSettings } from './storage.js';
 import { getLayout } from './layouts/index.js';
+import { HAND_SKINS, HAND_PLACEMENTS } from './hand-skins.js';
 
 export const AVATARS = ['🦊', '🐼', '🐸', '🦁', '🐙', '🦄', '🐢', '🐧', '🐱', '🐶', '🦉', '🐝', '🚀', '⚽', '🎸', '🌵'];
 export const MODES = ['kids', 'adult'];
@@ -96,12 +97,14 @@ export function createProfileService(store, { now = () => new Date(), newId = ra
       });
     },
 
-    /** settings: partial { sound, voice, theme }. */
+    /** settings: partial { sound, voice, theme, hands, handsPlacement }. */
     updateSettings(id, settings) {
       const valid =
         (settings.sound === undefined || typeof settings.sound === 'boolean') &&
         (settings.voice === undefined || typeof settings.voice === 'boolean') &&
-        (settings.theme === undefined || THEMES.includes(settings.theme));
+        (settings.theme === undefined || THEMES.includes(settings.theme)) &&
+        (settings.hands === undefined || HAND_SKINS.some(({ id: skinId }) => skinId === settings.hands)) &&
+        (settings.handsPlacement === undefined || HAND_PLACEMENTS.includes(settings.handsPlacement));
       if (!valid) throw new ProfileError('invalid');
       return change((data) => {
         const profile = find(data, id);

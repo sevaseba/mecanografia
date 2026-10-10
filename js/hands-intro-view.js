@@ -4,9 +4,9 @@
 // Kids get short texts, read aloud by a recorded voice when it is on.
 //
 //   bar (back · title · step N of M · screen tools · Saltear)
-//   panel (step title, explanation, what to press now / Escuchar · Siguiente)
-//   on-screen keyboard
-//   hands
+//   panel (step title, explanation, what to press now / Escuchar · Siguiente;
+//          first step: finger colors and the hands picker)
+//   on-screen keyboard with the hands
 
 import { el } from './dom.js';
 import { strings } from './strings.js';
@@ -14,6 +14,8 @@ import { announce } from './announcer.js';
 import { attachKeyboardInput } from './input.js';
 import { createKeyboardView } from './keyboard-view.js';
 import { createHandsView } from './hands-view.js';
+import { createHandsPicker } from './hands-picker.js';
+import { skinFor } from './hand-skins.js';
 import { buildIntroSteps, introTargets } from './hands-intro.js';
 import { introCopy } from './hands-intro-copy.js';
 import { createVoice } from './voice.js';
@@ -30,9 +32,20 @@ const IGNORED_KEYS = new Set(['Tab', 'Escape', 'Shift', 'Control', 'Alt', 'AltGr
  * @param {string} options.finishLabel   button on the last step
  * @param {Node[]} [options.tools]       screen-specific controls for the bar
  * @param {() => boolean} [options.voiceEnabled]  read the kids texts aloud
+ * @param {object} [options.hands]      look and placement of the hands (handsOf in hand-skins.js)
+ * @param {(settings: { hands, handsPlacement }) => void} [options.onHandsChange]  picked in the first step
  * @param {() => void} options.onDone    finished or skipped
  */
-export function createHandsIntroView({ keyIndex, backHref, finishLabel, tools = [], voiceEnabled = () => false, onDone }) {
+export function createHandsIntroView({
+  keyIndex,
+  backHref,
+  finishLabel,
+  tools = [],
+  voiceEnabled = () => false,
+  hands: handsOptions,
+  onHandsChange = () => {},
+  onDone,
+}) {
   const steps = buildIntroSteps(keyIndex);
   // Kids read less: every text has a short version for them, and only theirs are recorded.
   const kids = document.documentElement.dataset.mode === 'kids';
@@ -67,6 +80,20 @@ export function createHandsIntroView({ keyIndex, backHref, finishLabel, tools = 
       el('li', {}, el('span', { class: 'finger-legend__swatch', 'data-finger-group': group, 'aria-hidden': 'true' }), name),
     ),
   );
+  // The hands' look and placement, chosen while looking at them.
+  const mode = kids ? 'kids' : 'adult';
+  const picker = createHandsPicker({
+    mode,
+    hands: handsOptions?.skin.id,
+    handsPlacement: handsOptions?.placement,
+    compact: true,
+    onChange: (settings) => {
+      hands.setSkin(skinFor(settings.hands, mode));
+      hands.setPlacement(settings.handsPlacement);
+      showKey();
+      onHandsChange(settings);
+    },
+  });
   const instruction = el('p', { id: 'hands-intro-instruction', class: 'hands-intro__instruction' });
   const feedback = el('p', { class: 'hands-intro__feedback' });
   const listenButton = el(
@@ -90,14 +117,14 @@ export function createHandsIntroView({ keyIndex, backHref, finishLabel, tools = 
   const panel = el(
     'div',
     { class: 'hands-intro__panel' },
-    el('div', { class: 'hands-intro__text' }, stepTitle, stepBody, legend, instruction, feedback),
+    el('div', { class: 'hands-intro__text' }, stepTitle, stepBody, legend, picker.element, instruction, feedback),
     el('div', { class: 'hands-intro__actions' }, listenButton, nextButton),
     textarea,
     focusPrompt,
   );
 
   const keyboard = createKeyboardView(keyIndex.layout);
-  const hands = createHandsView();
+  const hands = createHandsView(keyIndex, handsOptions);
   const stage = el(
     'div',
     {
@@ -107,8 +134,7 @@ export function createHandsIntroView({ keyIndex, backHref, finishLabel, tools = 
       },
     },
     panel,
-    keyboard.element,
-    hands.element,
+    el('div', { class: 'keyboard-board' }, keyboard.element, hands.element),
   );
   const element = el('div', { class: 'practice-screen' }, bar, stage);
 
@@ -125,6 +151,8 @@ export function createHandsIntroView({ keyIndex, backHref, finishLabel, tools = 
     stepBody.textContent = stepCopy().body;
     feedback.textContent = '';
     legend.hidden = current.id !== 'fingers';
+    picker.element.hidden = current.id !== 'fingers';
+    stage.classList.toggle('is-choosing', current.id === 'fingers');
     skipButton.hidden = current.id === 'done';
     nextButton.hidden = isPracticeStep();
     nextButton.textContent = stepIndex === steps.length - 1 ? finishLabel : text.next;

@@ -9,6 +9,8 @@ import { layouts, defaultLayoutId } from '../layouts/index.js';
 import { createKeyIndex } from '../keystrokes.js';
 import { detectSystemLayout } from '../layout-check.js';
 import { createCalibrationView } from '../calibration-view.js';
+import { createHandsPicker } from '../hands-picker.js';
+import { DEFAULT_SKIN, DEFAULT_PLACEMENT } from '../hand-skins.js';
 
 const text = strings.profileForm;
 const keyIndexes = layouts.map(createKeyIndex);
@@ -67,6 +69,12 @@ export function render(container, params) {
   const syncThemeVisibility = () => {
     themeField.element.hidden = modeField.value() !== 'adult';
   };
+  // Costumes are for kids: the picker follows the mode chosen above.
+  const handsPicker = createHandsPicker({
+    mode: initial.mode,
+    hands: editing?.settings.hands ?? DEFAULT_SKIN,
+    handsPlacement: editing?.settings.handsPlacement ?? DEFAULT_PLACEMENT,
+  });
   const layoutField = radioGroup(
     'layout',
     text.layoutLabel,
@@ -81,7 +89,10 @@ export function render(container, params) {
     onUseLayout: (layoutId) => setLayout(layoutId),
   });
   layoutField.element.addEventListener('change', () => calibration.setLayout(layoutField.value()));
-  modeField.element.addEventListener('change', syncThemeVisibility);
+  modeField.element.addEventListener('change', () => {
+    syncThemeVisibility();
+    handsPicker.setMode(modeField.value());
+  });
   syncThemeVisibility();
 
   // A new profile starts with the layout the computer is using, when the browser can tell.
@@ -105,6 +116,7 @@ export function render(container, params) {
     avatarField.element,
     modeField.element,
     themeField.element,
+    handsPicker.element,
     layoutField.element,
     el('details', { class: 'calibration-details' }, el('summary', {}, strings.calibration.title), calibration.element),
     formError,
@@ -126,7 +138,7 @@ export function render(container, params) {
     };
     try {
       const saved = editing ? profiles.update(editing.id, fields) : profiles.create(fields);
-      profiles.updateSettings(saved.id, { theme: themeField.value() });
+      profiles.updateSettings(saved.id, { theme: themeField.value(), ...handsPicker.value() });
     } catch (error) {
       if (!(error instanceof ProfileError)) throw error;
       showError(error.reason);
