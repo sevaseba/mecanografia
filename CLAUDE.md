@@ -87,7 +87,7 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 - Teclas permitidas en una lección = espacio + todas las `newKeys` hasta esa lección inclusive. `tests/course.test.js` verifica que cada texto respete eso y que la distribución pueda escribirlo: correr `node --test` después de tocar lecciones.
 - Textos en español correcto (con sus tildes): si una palabra necesita una tecla que todavía no se enseñó, se elige otra palabra.
 - Cada intento = ejercicios fijos + uno generado al azar con `words` (o grupos de letras si hay menos de 4 palabras).
-- Reglas: aprobar con ≥ 90 % de precisión; estrellas 90/95/98 %; las PPM no condicionan. Infantil desbloquea en orden; adulto tiene todo abierto con la recomendada destacada.
+- Reglas: aprobar con ≥ 90 % de precisión (la velocidad nunca condiciona el aprobado). Estrellas: ★ 90 %; ★★ 95 % + meta de PPM netas; ★★★ 98 % + meta × 1,25. La meta depende de la unidad y el modo (`speedTargets` en `course.js`): ninguna en la primera unidad (fila guía) y desde la segunda sube hasta la última, infantil 5→15 y adulto 10→30. Al terminar cada lección, "¿Cómo se ganan las estrellas?" muestra qué pide cada estrella en esa lección y si se consiguió o qué faltó (`starGoals`; infantil con palabras simples y en positivo). Las estrellas ganadas no se pierden. Infantil desbloquea en orden; adulto tiene todo abierto con la recomendada destacada.
 - El service worker guarda todas las lecciones leyendo cada `index.json`; al cambiar lecciones, subir `CACHE_VERSION`.
 
 ## Modos

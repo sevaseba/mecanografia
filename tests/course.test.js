@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buildCourse, starsFor, lessonStates, recordAttempt, HISTORY_LIMIT } from '../js/course.js';
+import { buildCourse, starsFor, nextStar, starGoals, speedTargets, lessonStates, recordAttempt, HISTORY_LIMIT } from '../js/course.js';
 import { randomExercise } from '../js/exercise-generator.js';
 import { layouts } from '../js/layouts/index.js';
 import { createKeyIndex } from '../js/keystrokes.js';
@@ -60,13 +60,45 @@ test('lessons are numbered in order and know their allowed keys', () => {
   assert.equal(tinyCourse.get('zzz'), null);
 });
 
-test('stars: 90 / 95 / 98 % accuracy', () => {
-  assert.equal(starsFor(89.9), 0);
-  assert.equal(starsFor(90), 1);
-  assert.equal(starsFor(95), 2);
-  assert.equal(starsFor(97.9), 2);
-  assert.equal(starsFor(98), 3);
-  assert.equal(starsFor(100), 3);
+test('stars without speed targets: 90 / 95 / 98 % accuracy', () => {
+  assert.equal(starsFor({ accuracy: 89.9, wpm: 50 }), 0);
+  assert.equal(starsFor({ accuracy: 90, wpm: 1 }), 1);
+  assert.equal(starsFor({ accuracy: 95, wpm: null }), 2);
+  assert.equal(starsFor({ accuracy: 97.9, wpm: 1 }), 2);
+  assert.equal(starsFor({ accuracy: 98, wpm: 1 }), 3);
+  assert.equal(starsFor({ accuracy: 100, wpm: 1 }), 3);
+});
+
+test('with speed targets, speed counts for the 2nd and 3rd star but never for passing', () => {
+  const targets = { two: 10, three: 13 };
+  assert.equal(starsFor({ accuracy: 100, wpm: 2 }, targets), 1);
+  assert.equal(starsFor({ accuracy: 100, wpm: 10 }, targets), 2);
+  assert.equal(starsFor({ accuracy: 96, wpm: 30 }, targets), 2);
+  assert.equal(starsFor({ accuracy: 98, wpm: 13 }, targets), 3);
+  assert.equal(starsFor({ accuracy: 89, wpm: 30 }, targets), 0);
+});
+
+test('speed targets: none in the first unit, then growing to the top of each mode', () => {
+  const course = buildCourse(
+    { layout: 'x', units: ['u0', 'u1', 'u2', 'u3'].map((title, i) => ({ title, lessons: [`l${i}`] })) },
+    [0, 1, 2, 3].map((i) => ({ id: `l${i}`, title: '', newKeys: [], exercises: [], words: [] })),
+  );
+  const [first, second, , last] = course.lessons;
+  assert.equal(speedTargets(course, first, 'kids'), null);
+  assert.deepEqual(speedTargets(course, second, 'kids'), { two: 5, three: 6 });
+  assert.deepEqual(speedTargets(course, last, 'kids'), { two: 15, three: 19 });
+  assert.deepEqual(speedTargets(course, second, 'adult'), { two: 10, three: 13 });
+  assert.deepEqual(speedTargets(course, last, 'adult'), { two: 30, three: 38 });
+});
+
+test('nextStar says what is missing', () => {
+  const targets = { two: 10, three: 13 };
+  assert.deepEqual(nextStar({ accuracy: 100, wpm: 5 }, targets), { stars: 2, accuracy: 95, wpm: 10, missing: 'speed' });
+  assert.deepEqual(nextStar({ accuracy: 96, wpm: 20 }, targets), { stars: 3, accuracy: 98, wpm: 13, missing: 'accuracy' });
+  assert.deepEqual(nextStar({ accuracy: 91, wpm: 5 }, targets), { stars: 2, accuracy: 95, wpm: 10, missing: 'both' });
+  assert.deepEqual(nextStar({ accuracy: 80, wpm: 50 }, targets), { stars: 1, accuracy: 90, wpm: null, missing: 'accuracy' });
+  assert.equal(nextStar({ accuracy: 99, wpm: 20 }, targets), null);
+  assert.deepEqual(nextStar({ accuracy: 96, wpm: 1 }), { stars: 3, accuracy: 98, wpm: null, missing: 'accuracy' });
 });
 
 test('kids: lessons open one by one; adult: all open; recommended is the first not passed', () => {
@@ -99,6 +131,27 @@ test('recordAttempt keeps the best result, counts attempts and appends history',
   assert.deepEqual(progress.lessons.a, { stars: 2, bestAccuracy: 96, bestWpm: 25, attempts: 2, completedAt: 'T1' });
   assert.equal(progress.history.length, 2);
   assert.deepEqual(progress.history[1], { lessonId: 'a', date: 'T2', wpm: 25, accuracy: 91, durationMs: 4000, stars: 1 });
+});
+
+test('starGoals explains every star: what it asks for and what was missing', () => {
+  assert.deepEqual(starGoals({ accuracy: 96, wpm: 8 }, { two: 10, three: 13 }), [
+    { stars: 1, accuracy: 90, wpm: null, missing: null },
+    { stars: 2, accuracy: 95, wpm: 10, missing: 'speed' },
+    { stars: 3, accuracy: 98, wpm: 13, missing: 'both' },
+  ]);
+  assert.deepEqual(
+    starGoals({ accuracy: 100, wpm: null }).map(({ missing }) => missing),
+    [null, null, null],
+  );
+});
+
+test('recordAttempt uses the speed targets and keeps stars already earned', () => {
+  const targets = { two: 10, three: 13 };
+  let progress = recordAttempt({}, 'a', { accuracy: 99, wpm: 20, durationMs: 1 }, 'T1', targets);
+  assert.equal(progress.lessons.a.stars, 3);
+  progress = recordAttempt(progress, 'a', { accuracy: 99, wpm: 5, durationMs: 1 }, 'T2', targets);
+  assert.equal(progress.lessons.a.stars, 3);
+  assert.equal(progress.history[1].stars, 1);
 });
 
 test('a lesson is completed only when passed; history is capped', () => {

@@ -6,7 +6,12 @@
 //   history: [{ lessonId, date, wpm, accuracy, durationMs, stars }] }   // last HISTORY_LIMIT
 
 export const HISTORY_LIMIT = 200;
-const STAR_THRESHOLDS = [90, 95, 98]; // accuracy % for 1, 2 and 3 stars; 1 star = passed
+const STAR_ACCURACY = [90, 95, 98]; // accuracy % for 1, 2 and 3 stars; 1 star = passed
+// Speed counts only for the 2nd and 3rd star, never for passing: accuracy comes first. The
+// net WPM asked for the 2nd star grows from the second unit (none in the first one, the home
+// row) to the last; the 3rd star asks for THIRD_STAR_SPEED times as much.
+const SPEED_RANGE = { kids: [5, 15], adult: [10, 30] };
+const THIRD_STAR_SPEED = 1.25;
 const KIDS_SHORT_UNITS = 3; // in kids mode, exercises of the first units are kept short…
 const KIDS_SHORT_LENGTH = 40; // …at most this many characters
 
@@ -86,11 +91,43 @@ function trimToWords(text, maxLength) {
   return (lastSpace > 0 ? cut.slice(0, lastSpace) : text.slice(0, maxLength)).trimEnd();
 }
 
-export function starsFor(accuracy) {
-  return STAR_THRESHOLDS.filter((threshold) => accuracy >= threshold).length;
+/** Net WPM needed for the 2nd and 3rd star of a lesson: { two, three }, or null if speed does not count. */
+export function speedTargets(course, lesson, mode) {
+  const last = course.units.length - 1;
+  if (lesson.unitIndex === 0) return null;
+  const [min, max] = SPEED_RANGE[mode] ?? SPEED_RANGE.adult;
+  const two = Math.round(min + ((max - min) * (lesson.unitIndex - 1)) / Math.max(1, last - 1));
+  return { two, three: Math.round(two * THIRD_STAR_SPEED) };
 }
 
-export const PASS_ACCURACY = STAR_THRESHOLDS[0];
+/** Stars for a result { accuracy, wpm }. targets: from speedTargets (null: accuracy only). */
+export function starsFor({ accuracy, wpm }, targets = null) {
+  const fastEnough = (needed) => !targets || (wpm ?? 0) >= needed;
+  if (accuracy < STAR_ACCURACY[0]) return 0;
+  if (accuracy < STAR_ACCURACY[1] || !fastEnough(targets?.two)) return 1;
+  if (accuracy < STAR_ACCURACY[2] || !fastEnough(targets?.three)) return 2;
+  return 3;
+}
+
+/**
+ * What each star asks for in a lesson and whether a result got it, to explain the stars:
+ * [{ stars: 1|2|3, accuracy, wpm (null if speed does not count), missing }]
+ * missing: null (earned), 'accuracy', 'speed' or 'both'.
+ */
+export function starGoals(result, targets = null) {
+  const speeds = [null, targets?.two ?? null, targets?.three ?? null];
+  return STAR_ACCURACY.map((accuracy, i) => {
+    const wpm = speeds[i];
+    const careless = result.accuracy < accuracy;
+    const slow = wpm !== null && (result.wpm ?? 0) < wpm;
+    return { stars: i + 1, accuracy, wpm, missing: careless && slow ? 'both' : careless ? 'accuracy' : slow ? 'speed' : null };
+  });
+}
+
+/** The first star not earned yet (see starGoals), or null with three stars. */
+export const nextStar = (result, targets = null) => starGoals(result, targets).find((goal) => goal.missing) ?? null;
+
+export const PASS_ACCURACY = STAR_ACCURACY[0];
 
 /**
  * @returns {Map<string, { status: 'locked'|'available'|'completed', stars: number, recommended: boolean }>}
@@ -116,10 +153,11 @@ export function lessonStates(course, progress, mode) {
 
 /**
  * New progress after an attempt. result: { accuracy, wpm (may be null), durationMs, keyStats? }.
+ * targets: the lesson's speedTargets. Stars already earned are kept.
  * keyStats ({ char: [errors, attempts] }) accumulate in progress.keyStats.
  */
-export function recordAttempt(progress, lessonId, result, date) {
-  const stars = starsFor(result.accuracy);
+export function recordAttempt(progress, lessonId, result, date, targets = null) {
+  const stars = starsFor(result, targets);
   const lessons = progress?.lessons ?? {};
   const previous = lessons[lessonId] ?? { stars: 0, bestAccuracy: 0, bestWpm: 0, attempts: 0, completedAt: null };
   const updated = {

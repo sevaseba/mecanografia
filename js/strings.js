@@ -222,8 +222,24 @@ export const strings = {
     restartLesson: 'Empezar de nuevo',
     passedTitle: '¡Lección aprobada!',
     failedTitle: 'Todavía no aprobaste',
-    passedMessage: (stars) =>
-      stars === 3 ? '¡Perfecta! Conseguiste las tres estrellas.' : 'Para más estrellas, buscá más precisión.',
+    perfect: '¡Perfecta! Conseguiste las tres estrellas.',
+    starGoals: {
+      title: '¿Cómo se ganan las estrellas?',
+      needs: {
+        adult: (accuracy, wpm) => (wpm === null ? `${accuracy} % de precisión` : `${accuracy} % de precisión y ${wpm} PPM`),
+        kids: (accuracy, wpm) =>
+          wpm === null ? `Acertá el ${accuracy} % de las teclas` : `Acertá el ${accuracy} % y escribí ${wpm} palabras por minuto`,
+      },
+      done: '✓ ¡Conseguida!',
+      missing: {
+        adult: { accuracy: 'Te faltó precisión', speed: 'Te faltó velocidad', both: 'Te faltó precisión y velocidad' },
+        kids: {
+          accuracy: 'Te falta un poquito de puntería',
+          speed: 'Te falta un poquito de velocidad',
+          both: 'Te falta un poquito de puntería y de velocidad',
+        },
+      },
+    },
     failedMessage: (needed) => `Para aprobar necesitás ${needed} % de precisión. ¡Probá de nuevo, sin apuro!`,
     newRecord: '¡Nuevo récord!',
     accuracy: (value) => `Precisión: ${value} %`,

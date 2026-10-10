@@ -3,7 +3,7 @@
 // files to PRECACHE. Lesson files and voice clips are not listed: they are read from each
 // course index.json and from the voice index.
 
-const CACHE_VERSION = 'v27';
+const CACHE_VERSION = 'v29';
 const CACHE_NAME = `mecanografia-${CACHE_VERSION}`;
 
 const PRECACHE = [
@@ -125,8 +125,12 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
 
-  // Page navigations always get the app shell; routing happens in the hash.
+  // Navigations to the app get the app shell (routing happens in the hash). Other pages
+  // of the site (such as the tools/ prototypes) are left to the network.
   if (request.mode === 'navigate') {
+    const { pathname } = new URL(request.url);
+    const appRoot = new URL('./', self.registration.scope).pathname;
+    if (pathname !== appRoot && pathname !== `${appRoot}index.html`) return;
     event.respondWith(caches.match('./index.html').then((cached) => cached ?? fetch(request)));
     return;
   }

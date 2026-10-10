@@ -16,6 +16,9 @@ import {
   lessonStates,
   recordAttempt,
   starsFor,
+  nextStar,
+  starGoals,
+  speedTargets,
   exercisesFor,
   randomExerciseLength,
   PASS_ACCURACY,
@@ -133,11 +136,15 @@ export function render(container, params) {
     const stats = combineStats(sessions);
     const before = profiles.progressFor(profile.id, profile.layoutId).lessons?.[lesson.id];
     const now = new Date();
+    const kids = profiles.get(profile.id).mode === 'kids';
+    const targets = speedTargets(course, lesson, kids ? 'kids' : 'adult');
+    const result = { accuracy: stats.accuracy ?? 0, wpm: stats.wpm };
     const progress = recordAttempt(
       profiles.progressFor(profile.id, profile.layoutId),
       lesson.id,
-      { accuracy: stats.accuracy ?? 0, wpm: stats.wpm, durationMs: stats.durationMs, keyStats: stats.keyStats },
+      { ...result, durationMs: stats.durationMs, keyStats: stats.keyStats },
       now.toISOString(),
+      targets,
     );
     profiles.saveProgress(profile.id, profile.layoutId, progress);
     const medals = newMedals(profiles.get(profile.id), course, now);
@@ -145,10 +152,11 @@ export function render(container, params) {
 
     view.destroy();
     view = null;
-    const stars = starsFor(stats.accuracy ?? 0);
+    const stars = starsFor(result, targets);
+    const goal = nextStar(result, targets);
+    const goals = starGoals(result, targets);
     const isRecord = before && stats.accuracy > before.bestAccuracy;
-    const kids = profiles.get(profile.id).mode === 'kids';
-    const screen = results({ course, lesson, stats, stars, isRecord, kids, medals, retry: () => start(course, lesson) });
+    const screen = results({ course, lesson, stats, stars, goal, goals, isRecord, kids, medals, retry: () => start(course, lesson) });
     container.replaceChildren(screen);
     container.querySelector('.results .button')?.focus();
     announce(screen.querySelector('h1').textContent);
@@ -163,6 +171,31 @@ export function render(container, params) {
   };
 }
 
+// "¿Cómo se ganan las estrellas?": each star, what it asks for in this lesson and whether
+// it was earned or what was missing (for kids, in simple and positive words).
+function starGoalsList(goals, kids) {
+  const audience = kids ? 'kids' : 'adult';
+  const goalText = text.starGoals;
+  return el(
+    'section',
+    { class: 'star-goals', 'aria-labelledby': 'star-goals-title' },
+    el('h2', { id: 'star-goals-title', class: 'star-goals__title' }, goalText.title),
+    el(
+      'ul',
+      { class: 'star-goals__list' },
+      goals.map(({ stars, accuracy, wpm, missing }) =>
+        el(
+          'li',
+          { class: `star-goals__item${missing ? '' : ' star-goals__item--done'}` },
+          renderStars(stars),
+          el('span', { class: 'star-goals__needs' }, goalText.needs[audience](accuracy, wpm)),
+          el('span', { class: 'star-goals__status' }, missing ? goalText.missing[audience][missing] : goalText.done),
+        ),
+      ),
+    ),
+  );
+}
+
 function medalsEarned(course, medals) {
   return el(
     'div',
@@ -172,14 +205,16 @@ function medalsEarned(course, medals) {
   );
 }
 
-function results({ course, lesson, stats, stars, isRecord, kids, medals, retry }) {
+function results({ course, lesson, stats, stars, goal, goals, isRecord, kids, medals, retry }) {
   const passed = stars > 0;
   // Kids: varied, always positive words. Adults: plain facts.
   const heading = kids ? pickOne(passed ? strings.encouragement.passed : strings.encouragement.retry) : passed ? text.passedTitle : text.failedTitle;
   const message = kids
     ? pickOne(passed ? strings.encouragement.passedMessage : strings.encouragement.retryMessage)
     : passed
-      ? text.passedMessage(stars)
+      ? goal
+        ? null // the star goals below say what is missing
+        : text.perfect
       : text.failedMessage(PASS_ACCURACY);
   const next = course.next(lesson.id);
   const actions = [];
@@ -216,7 +251,8 @@ function results({ course, lesson, stats, stars, isRecord, kids, medals, retry }
       el('span', {}, text.uncorrectedErrors(stats.uncorrectedErrors)),
     ),
     isRecord ? el('p', { class: 'results__record' }, text.newRecord) : null,
-    el('p', {}, message),
+    message ? el('p', {}, message) : null,
+    starGoalsList(goals, kids),
     kids && medals.length ? medalsEarned(course, medals) : null,
     passed && !next ? el('p', { class: 'results__record' }, text.courseFinished) : null,
     el('div', { class: 'results__actions' }, actions),

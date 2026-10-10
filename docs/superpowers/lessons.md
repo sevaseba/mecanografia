@@ -25,3 +25,19 @@
 **Reglas:**
 - Antes de verificar un cambio en el navegador, desregistrar el service worker y borrar las cachés (`navigator.serviceWorker.getRegistrations()` + `caches.keys()`), y recargar. Repetirlo después de cada cambio de archivos.
 - Si una medición "no cambia" después de editar, sospechar primero de la caché.
+
+## 2026-10-09 — "No se ve el botón Demo"
+
+**Qué pasó:** el prototipo `tools/hands-prototype.html` no le cargaba al usuario: en ese puerto ya había un service worker de la app, que respondía a *toda* navegación con `index.html`. En mi navegador funcionaba porque yo había desregistrado el service worker antes de probar.
+
+**Reglas:**
+- El service worker solo devuelve la app al navegar a la raíz de la app (o `index.html`); el resto de las páginas del sitio van a la red.
+- Antes de decirle al usuario "abrí tal página", probarla en las mismas condiciones que él: con el service worker de la app registrado, no con todo limpio.
+
+## 2026-10-09 — Pantalla en blanco por una variable repetida
+
+**Qué pasó:** al agregar la "próxima estrella" en `lesson.js`, un parámetro nuevo `next` chocaba con una `const next` que ya existía en la misma función. El módulo no cargaba y la lección quedaba en blanco, sin error en la consola de la página. Las pruebas pasaban porque no cargan las pantallas.
+
+**Reglas:**
+- Después de tocar cualquier módulo, correr `node --check` sobre todos los `.js` (detecta errores de sintaxis como declaraciones repetidas), no solo `node --test`.
+- Si una pantalla queda en blanco sin errores, probar `await import('/js/…')` desde la consola: muestra el error de carga del módulo.
