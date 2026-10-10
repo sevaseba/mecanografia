@@ -58,3 +58,12 @@
 **Reglas:**
 - Todo `href` interno empieza con `#/` (buscar `href:` en `js/` al agregar enlaces).
 - Al verificar un formulario, probar también los botones secundarios (Cancelar, Volver), no solo el envío.
+
+## 2026-10-10 — "La lección nunca comienza" (siempre vuelve a Posición de las manos)
+
+**Qué pasó:** en el navegador del usuario corría la app vieja del service worker (v34, esquema 3), pero los datos ya estaban en esquema 4: alguna carga sin service worker (Ctrl+Shift+R) había corrido la versión nueva y los migró. La app vieja abre datos más nuevos en solo lectura, así que no guardaba nada: ni la guía hecha, ni estrellas. En local no se veía porque siempre se prueba con el service worker limpio.
+
+**Reglas:**
+- Ante un error que solo pasa en GitHub Pages, mirar primero el estado del navegador del usuario (versión de `caches.keys()`, `version` de los datos, worker en espera) antes de buscar en el código.
+- Un cambio de esquema hace que la app vieja no pueda guardar: por eso, con datos más nuevos, la app se actualiza sola (`outdated` en `pwa.js`).
+- No sugerir Ctrl+Shift+R en el sitio publicado: mezcla versiones. Para actualizar, "Actualizar" en el aviso.

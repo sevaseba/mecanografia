@@ -147,10 +147,6 @@
   font-weight: 600;
 }
 
-.hands-picker--compact .hands-picker__label {
-  white-space: nowrap;
-}
-
 .hands-picker__skins {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
@@ -178,51 +174,4 @@
 .hand-option__name {
   display: block;
   font-size: 0.8em;
-}
-
-/* In the hands intro: icons only; the looks and the placement share a row when they fit. */
-.hands-picker--compact {
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.3rem 1.2rem;
-}
-
-/* The question goes to the left of its options. */
-.hands-picker--compact .hands-picker__group {
-  flex-direction: row;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.hands-picker--compact .hands-picker__skins {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.3rem;
-  max-width: none;
-}
-
-.hands-picker--compact .hands-picker__skins .choice-tile {
-  width: 2.2rem;
-}
-
-.hands-picker--compact .hands-picker__placements {
-  display: flex;
-  gap: 0.4rem;
-}
-
-.hands-picker--compact .hand-option {
-  padding: 0.1rem 0;
-}
-
-.hands-picker--compact .hand-option__icon {
-  font-size: 1.3rem;
-}
-
-.hands-picker--compact .hand-option__name {
-  display: none;
-}
-
-.hands-picker--compact .option-card {
-  padding: 0.3rem 0.75rem;
 }

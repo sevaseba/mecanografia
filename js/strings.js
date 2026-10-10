@@ -185,6 +185,8 @@ export const strings = {
   hands: {
     label: 'Tus manos',
     kidsLabel: 'Elegí tus manos',
+    change: 'Cambiar las manos',
+    done: 'Listo',
     skins: {
       'tone-1': 'Piel muy clara',
       'tone-2': 'Piel clara',

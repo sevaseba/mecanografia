@@ -8,14 +8,54 @@
   --cue-h: 0px;
 }
 
-/* First step: room for the finger colors and the hands picker. */
-.practice-stage.hands-intro.is-choosing {
-  --line-h: 11.5rem;
+/* First step: the finger colors, and the button that opens the hands picker. */
+.hands-intro__fingers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em 1.5em;
+  margin-top: 0.3em;
 }
 
-.hands-intro .hands-picker {
-  margin-top: 0.4em;
-  font-size: 0.85em;
+.hands-intro__fingers[hidden] {
+  display: none;
+}
+
+.hands-intro__fingers .finger-legend {
+  margin: 0;
+}
+
+/* The picker opens at the top and dims little, so the hands under the keyboard stay in view. */
+.dialog.hands-dialog {
+  max-width: calc(100vw - 2rem);
+  margin-top: 1rem;
+  padding: var(--space-md) var(--space-lg);
+}
+
+/* "Listo" sits at the end of the last row (where to show the hands), not on a row of its own. */
+.hands-dialog[open] {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-lg);
+}
+
+.hands-dialog::backdrop {
+  background: rgb(0 0 0 / 0.15);
+}
+
+/* Kids: five tones on top, six costumes below. */
+.hands-dialog .hands-picker__skins {
+  grid-template-columns: repeat(6, 5.5rem);
+  max-width: none;
+}
+
+/* HAND_SKINS lists the five tones first. */
+.hands-dialog .hands-picker__skins > :nth-child(6) {
+  grid-column-start: 1;
+}
+
+.hands-dialog .hand-option__icon {
+  font-size: 1.5rem;
 }
 
 .hands-intro__panel {

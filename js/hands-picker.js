@@ -1,6 +1,6 @@
 // Picker for the hands drawn with the keyboard: their look (skin tones for everyone, costumes
 // for kids) and where they go (below or over the keyboard). Used in the profile form and in
-// the first step of the hands intro. Native radios drawn as tiles (see profiles.css).
+// a dialog of the hands intro's first step. Native radios drawn as tiles (see profiles.css).
 
 import { el } from './dom.js';
 import { strings } from './strings.js';
@@ -14,10 +14,9 @@ let count = 0; // radio group names must be unique on the page
  * @param {'kids' | 'adult'} options.mode  adults are only offered the skin tones
  * @param {string} options.hands           selected skin id
  * @param {'below' | 'over'} options.handsPlacement
- * @param {boolean} [options.compact]      icons only (names stay as accessible names)
  * @param {(settings: { hands, handsPlacement }) => void} [options.onChange]
  */
-export function createHandsPicker({ mode, hands, handsPlacement, compact = false, onChange = () => {} }) {
+export function createHandsPicker({ mode, hands, handsPlacement, onChange = () => {} }) {
   const id = ++count;
   const skinInputs = new Map();
   const skinTiles = HAND_SKINS.map((skin) => {
@@ -56,7 +55,7 @@ export function createHandsPicker({ mode, hands, handsPlacement, compact = false
   const skinLabel = el('span', { id: `hands-skin-label-${id}`, class: 'hands-picker__label' });
   const element = el(
     'div',
-    { class: `hands-picker${compact ? ' hands-picker--compact' : ''}` },
+    { class: 'hands-picker' },
     el(
       'div',
       { class: 'field hands-picker__group', role: 'radiogroup', 'aria-labelledby': skinLabel.id },

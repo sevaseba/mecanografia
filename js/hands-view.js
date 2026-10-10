@@ -28,8 +28,8 @@ const STRETCH = { min: 0.7, max: 1.3 }; // and more if the finger would stretch 
 const TIP_DOWN = 0.42; // a reaching fingertip touches the bottom of its key, leaving the label visible
 const BEND = 0.35; // below the keyboard, how far a finger in use moves towards its key
 const ABOVE_TIPS = 0.7; // below the keyboard, room above the resting fingertips
-const BELOW_CUT = 0.2; // below the keyboard, how much palm is shown under the keyboard's bottom line
-const FADE = { over: 1.8, below: 1.3 }; // key units over which the wrists fade out
+const BELOW_THUMBS = 1.1; // below the keyboard, how much is shown under the resting thumb tips (whole nail)
+const FADE = { over: 1.8, below: 0.5 }; // key units over which the wrists fade out
 
 // Finger proportions in key units: length from the touching point to the knuckle, width at
 // the knuckle and at the tip. Middle finger longest, ring a bit longer than index, pinky
@@ -77,12 +77,14 @@ export function createHandsView(keyIndex, { skin = HAND_SKINS.find(({ id }) => i
     draw(current);
   }
 
-  // Over: the drawing covers the keyboard. Below: only the part from the fingertips down.
+  // Over: the drawing covers the keyboard. Below: from the fingertips to just under the thumbs.
   function applyPlacement() {
     const size = boardSize(keyIndex.layout);
     const below = placement === 'below';
-    const top = below ? Math.min(...hands.flatMap((hand) => [...hand.fingers.values()].map((f) => f.rest.y))) - ABOVE_TIPS : 0;
-    const bottom = size.height + (below ? BELOW_CUT : BELOW_BOARD);
+    const tips = hands.flatMap((hand) => [...hand.fingers.values()].map((f) => f.rest.y));
+    const top = below ? Math.min(...tips) - ABOVE_TIPS : 0;
+    // Below, the thumbs (lowest tips) must show whole: the fade starts under them.
+    const bottom = below ? Math.max(...tips) + BELOW_THUMBS : size.height + BELOW_BOARD;
     element.dataset.placement = placement;
     element.setAttribute('viewBox', `0 ${top} ${size.width} ${bottom - top}`);
     element.style.aspectRatio = `${size.width} / ${bottom - top}`;

@@ -3,7 +3,7 @@
 // files to PRECACHE. Lesson files and voice clips are not listed: they are read from each
 // course index.json and from the voice index.
 
-const CACHE_VERSION = 'v36';
+const CACHE_VERSION = 'v37';
 const CACHE_NAME = `mecanografia-${CACHE_VERSION}`;
 
 const PRECACHE = [

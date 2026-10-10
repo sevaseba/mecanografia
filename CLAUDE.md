@@ -120,7 +120,7 @@ Guía interactiva que se muestra sola antes de la primera lección de cada curso
 - **Voz (solo infantil):** los textos de los chicos se leen con clips grabados con ElevenLabs y una voz rioplatense de su biblioteca (las voces genéricas sonaban a "yankee hablando español" y no pronunciaban el voseo). Las letras sueltas se leen por su nombre ("la efe"), ver `spokenText`. Interruptor "Voz" (`settings.voice`, prendido por defecto) y botón "Escuchar". Al terminar una lección, la voz también dice una frase corta sobre la próxima estrella, sin números (`strings.lessons.resultVoice`: puntería, velocidad, las dos, las tres estrellas o no aprobó).
   - Cada clip se llama como su frase (`voice-clips.js`), así las frases repetidas entre distribuciones comparten archivo. Solo se reproducen los clips listados en `assets/audio/kids/index.json`.
   - Al cambiar un texto infantil de la guía: `node tools/generate-voice.mjs` (necesita `ELEVENLABS_API_KEY` y `ELEVENLABS_VOICE_ID`; `--list` muestra qué falta sin grabar; `--force` regraba todo, por ejemplo al cambiar de voz) y subir `CACHE_VERSION`. El service worker guarda los clips leyendo ese index.json.
-- El paso 1 ("Tus dedos") incluye el selector de manos: lo elegido se ve al instante y se guarda en el perfil.
+- El paso 1 ("Tus dedos") tiene el botón "Elegí tus manos", que abre el selector en un `<dialog>` arriba (el panel no crece y el teclado no se achica); lo elegido se ve al instante y se guarda en el perfil.
 - Al terminar o saltear se guarda `progress[layoutId].introCompletedAt`: es por distribución, como el resto del curso.
 
 ## Pantalla de práctica
@@ -137,7 +137,7 @@ Teclado libre y lecciones usan `practice-view.js`. Reglas de diseño:
 
 `hands-view.js` dibuja dos manos desde la geometría de la distribución (cualquier distribución sirve). Cada perfil elige:
 - **Aspecto** (`settings.hands`, `hand-skins.js`): 5 tonos de piel para todos; en infantil, además, disfraces originales (Telaraña, Armadura, Tigre, Brillos, Robot, Monstruo), nunca copias de personajes. Los colores van en `css/hands.css`; los nombres en `strings.hands`. Un adulto con un disfraz guardado ve el tono por defecto (`skinFor`).
-- **Ubicación** (`settings.handsPlacement`): `below` (por defecto) en una franja debajo del teclado, sólidas, y el dedo en uso se inclina hacia su tecla; `over` apoyadas sobre el teclado, muy translúcidas (piel, uñas y dibujos), y el dedo se estira hasta la tecla. Nunca deben tapar las letras.
+- **Ubicación** (`settings.handsPlacement`): `below` (por defecto) en una franja debajo del teclado, sólidas, desde las yemas hasta justo debajo de los pulgares (que se ven enteros), y el dedo en uso se inclina hacia su tecla; `over` apoyadas sobre el teclado, muy translúcidas (piel, uñas y dibujos), y el dedo se estira hasta la tecla. Nunca deben tapar las letras.
 - Las uñas llevan el color del dedo en todos los aspectos: las indicaciones infantiles nombran los dedos por color.
 - El tamaño sale de `--hands-units` (unidades de tecla bajo el teclado) en `practice.css`.
 
@@ -151,7 +151,7 @@ Teclado libre y lecciones usan `practice-view.js`. Reglas de diseño:
 - Para identificar teclas físicas se usa `KeyboardEvent.code`. El carácter producido se toma de los eventos `input`/`compositionend` de un textarea oculto (no de `keydown`), porque ahí el sistema ya compuso las teclas muertas (´ + a → á). Ver `input.js`.
 - El formato de los archivos de distribución está documentado al principio de `js/layouts/es-latam.js`.
 - `navigator.keyboard.getLayoutMap()` (solo Chromium) devuelve únicamente la capa base, y las teclas muertas como su carácter de espaciado (`BracketLeft` → `´` en es-latam), nunca `"Dead"`. Verificado en Chrome 153 / Windows.
-- Cuando se agrega o renombra un archivo de la app, actualizar la lista de precache en `sw.js` y subir su versión de caché. El service worker nuevo **espera** a que el usuario acepte "Hay una actualización disponible" (no usa `skipWaiting` al instalarse).
+- Cuando se agrega o renombra un archivo de la app, actualizar la lista de precache en `sw.js` y subir su versión de caché. El service worker nuevo **espera** a que el usuario acepte "Hay una actualización disponible" (no usa `skipWaiting` al instalarse). Excepción: si los datos guardados son de una versión más nueva que la app que corre (quedan de solo lectura), la app está desactualizada y se actualiza sola apenas hay versión nueva (`registerServiceWorker({ outdated })`).
 
 ## Regla de verificación
 

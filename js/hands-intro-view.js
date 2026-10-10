@@ -5,7 +5,7 @@
 //
 //   bar (back · title · step N of M · screen tools · Saltear)
 //   panel (step title, explanation, what to press now / Escuchar · Siguiente;
-//          first step: finger colors and the hands picker)
+//          first step: finger colors and a button that opens the hands picker)
 //   on-screen keyboard with the hands
 
 import { el } from './dom.js';
@@ -80,20 +80,19 @@ export function createHandsIntroView({
       el('li', {}, el('span', { class: 'finger-legend__swatch', 'data-finger-group': group, 'aria-hidden': 'true' }), name),
     ),
   );
-  // The hands' look and placement, chosen while looking at them.
+  // The hands' look and placement, chosen in a dialog while looking at them (in the panel the
+  // picker would make it taller and the keyboard smaller).
   const mode = kids ? 'kids' : 'adult';
-  const picker = createHandsPicker({
-    mode,
-    hands: handsOptions?.skin.id,
-    handsPlacement: handsOptions?.placement,
-    compact: true,
-    onChange: (settings) => {
-      hands.setSkin(skinFor(settings.hands, mode));
-      hands.setPlacement(settings.handsPlacement);
-      showKey();
-      onHandsChange(settings);
-    },
-  });
+  let handsSettings = { hands: handsOptions?.skin.id, handsPlacement: handsOptions?.placement };
+  let handsDialog = null;
+  const handsLabel = kids ? strings.hands.kidsLabel : strings.hands.change;
+  const handsButton = el(
+    'button',
+    { type: 'button', class: 'button button--secondary button--small', onClick: openHandsDialog },
+    el('span', { 'aria-hidden': 'true' }, '✋ '),
+    handsLabel,
+  );
+  const fingers = el('div', { class: 'hands-intro__fingers' }, legend, handsButton);
   const instruction = el('p', { id: 'hands-intro-instruction', class: 'hands-intro__instruction' });
   const feedback = el('p', { class: 'hands-intro__feedback' });
   const listenButton = el(
@@ -117,7 +116,7 @@ export function createHandsIntroView({
   const panel = el(
     'div',
     { class: 'hands-intro__panel' },
-    el('div', { class: 'hands-intro__text' }, stepTitle, stepBody, legend, picker.element, instruction, feedback),
+    el('div', { class: 'hands-intro__text' }, stepTitle, stepBody, fingers, instruction, feedback),
     el('div', { class: 'hands-intro__actions' }, listenButton, nextButton),
     textarea,
     focusPrompt,
@@ -150,9 +149,7 @@ export function createHandsIntroView({
     stepTitle.textContent = stepCopy().title;
     stepBody.textContent = stepCopy().body;
     feedback.textContent = '';
-    legend.hidden = current.id !== 'fingers';
-    picker.element.hidden = current.id !== 'fingers';
-    stage.classList.toggle('is-choosing', current.id === 'fingers');
+    fingers.hidden = current.id !== 'fingers';
     skipButton.hidden = current.id === 'done';
     nextButton.hidden = isPracticeStep();
     nextButton.textContent = stepIndex === steps.length - 1 ? finishLabel : text.next;
@@ -222,12 +219,48 @@ export function createHandsIntroView({
     }
   }
 
+  function openHandsDialog() {
+    const picker = createHandsPicker({
+      mode,
+      ...handsSettings,
+      onChange: (settings) => {
+        handsSettings = settings;
+        hands.setSkin(skinFor(settings.hands, mode));
+        hands.setPlacement(settings.handsPlacement);
+        showKey();
+        onHandsChange(settings);
+      },
+    });
+    const doneButton = el('button', { type: 'button', class: 'button', onClick: closeHandsDialog }, strings.hands.done);
+    handsDialog = el(
+      'dialog',
+      { class: 'dialog hands-dialog', 'aria-label': handsLabel },
+      picker.element,
+      el('div', { class: 'dialog__actions' }, doneButton),
+    );
+    // Escape closes it through the same path.
+    handsDialog.addEventListener('close', closeHandsDialog);
+    document.body.append(handsDialog);
+    handsDialog.showModal();
+    handsDialog.querySelector('input:checked')?.focus(); // the current choice, not the first one
+  }
+
+  function closeHandsDialog() {
+    if (!handsDialog) return;
+    const dialog = handsDialog;
+    handsDialog = null;
+    if (dialog.open) dialog.close();
+    dialog.remove();
+    handsButton.focus();
+  }
+
   function finish() {
     voice.stop();
     onDone();
   }
 
   function destroy() {
+    handsDialog?.remove();
     clearTimeout(nextTimer);
     voice.stop();
     input.detach();
