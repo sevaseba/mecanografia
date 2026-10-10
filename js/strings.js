@@ -281,14 +281,16 @@ export const strings = {
         adult: () =>
           'Cada dedo tiene un color. Las teclas del mismo color se presionan siempre con ese dedo. ' +
           'Los pulgares se encargan de la barra espaciadora.',
-        kids: () => 'Cada dedo tiene un color. Apretá las teclas de su mismo color.',
+        kids: () => 'Cada dedo tiene un color. Cada tecla se aprieta con el dedo de su mismo color.',
       },
       home: {
         title: 'La fila guía',
         adult: (left, right, keys) =>
           `Apoyá los dedos índice sobre la ${left} y la ${right}: tienen un relieve que se siente con la yema. ` +
           `Los demás dedos van al lado, uno en cada tecla: ${keys}. Los pulgares descansan sobre la barra espaciadora.`,
-        kids: (left, right) => `Poné los índices en la ${left} y la ${right}: tienen una rayita. Los otros dedos van al lado.`,
+        kids: (left, right) =>
+          `Poné los índices en la ${left} y la ${right}: tienen una rayita. ` +
+          'Los otros dedos van en las teclas de al lado, uno en cada una. Los pulgares, en el espacio.',
       },
       homeKeys: {
         title: 'Probá cada dedo',
