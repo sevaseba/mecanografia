@@ -209,7 +209,7 @@ export const strings = {
     greeting: (name) => `¡Hola, ${name}!`,
     progress: 'Mi progreso',
     lessons: 'Lecciones',
-    lessonsDescription: 'Aprendé paso a paso, de la fila guía a los números.',
+    lessonsDescription: 'Aprendé paso a paso, desde las teclas del medio hasta los números.',
     start: 'Empezar',
     continue: 'Seguir',
     nextLesson: (number, title) => `Lección ${number}: ${title}`,
@@ -315,7 +315,7 @@ export const strings = {
         kids: () => 'Cada dedo tiene un color. Cada tecla se aprieta con el dedo de su mismo color.',
       },
       home: {
-        title: 'La fila guía',
+        title: 'Dónde apoyar los dedos',
         adult: (left, right, keys) =>
           `Apoyá los dedos índice sobre la ${left} y la ${right}: tienen un relieve que se siente con la yema. ` +
           `Los demás dedos van al lado, uno en cada tecla: ${keys}. Los pulgares descansan sobre la barra espaciadora.`,
@@ -325,18 +325,18 @@ export const strings = {
       },
       homeKeys: {
         title: 'Probá cada dedo',
-        adult: () => 'Con las manos en la fila guía, presioná la tecla iluminada con el dedo iluminado.',
+        adult: () => 'Con cada dedo apoyado en su lugar, presioná la tecla iluminada con el dedo iluminado.',
         kids: () => 'Apretá la tecla que brilla.',
       },
       zones: {
         title: 'La zona de cada dedo',
-        adult: () => 'Cada dedo se estira hasta las teclas de su color y después vuelve a su lugar en la fila guía.',
+        adult: () => 'Cada dedo se estira hasta las teclas de su color y después vuelve a su lugar.',
         kids: () => 'Estirá el dedo y volvé a tu lugar.',
       },
       done: {
         title: '¡Listo!',
         adult: (left, right) =>
-          `Ya sabés dónde va cada dedo. Cada vez que empieces, buscá los relieves de la ${left} y la ${right} y apoyá las manos en la fila guía.`,
+          `Ya sabés dónde va cada dedo. Cada vez que empieces, buscá los relieves de la ${left} y la ${right} y apoyá cada dedo en su lugar.`,
         kids: () => '¡Ya sabés dónde va cada dedo!',
       },
     },

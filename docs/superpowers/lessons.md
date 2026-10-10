@@ -67,3 +67,12 @@
 - Ante un error que solo pasa en GitHub Pages, mirar primero el estado del navegador del usuario (versión de `caches.keys()`, `version` de los datos, worker en espera) antes de buscar en el código.
 - Un cambio de esquema hace que la app vieja no pueda guardar: por eso, con datos más nuevos, la app se actualiza sola (`outdated` en `pwa.js`).
 - No sugerir Ctrl+Shift+R en el sitio publicado: mezcla versiones. Para actualizar, "Actualizar" en el aviso.
+
+## 2026-10-10 — "Fila guía" no se entiende
+
+**Qué pasó:** una persona que nunca estudió mecanografía no supo por dónde empezar: el mapa abría con la unidad "Fila guía" y la guía de las manos tenía un paso con ese título, pero nunca se explicaba. Además, "Tus manos / Dónde se ven" en el perfil se leyó como dónde apoyar las manos de verdad.
+
+**Reglas:**
+- Ningún término técnico del oficio (fila guía, PPM sin explicar, etc.) en la interfaz si no se define donde aparece; mejor reemplazarlo por palabras comunes.
+- Al nombrar algo que es un dibujo o una opción de la app, decirlo ("de la pantalla"), para que no se lea como una instrucción física.
+- Revisar cada pantalla nueva leyéndola como alguien que nunca escribió a máquina.

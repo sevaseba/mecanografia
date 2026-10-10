@@ -88,7 +88,7 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 
 ## Lecciones
 
-- Formato: `index.json` = `{ layout, units: [{ title, description, lessons: [ids] }] }` (`description`: una línea en palabras simples bajo el título de la unidad en el mapa, porque "Fila guía" no le dice nada a quien empieza); cada lección = `{ id, title, newKeys, exercises, words }`. Los JSON son la fuente de verdad y se editan a mano.
+- Formato: `index.json` = `{ layout, units: [{ title, description, lessons: [ids] }] }` (`description`: una línea en palabras simples bajo el título de la unidad en el mapa); cada lección = `{ id, title, newKeys, exercises, words }`. Los JSON son la fuente de verdad y se editan a mano.
 - Teclas permitidas en una lección = espacio + todas las `newKeys` hasta esa lección inclusive. `tests/course.test.js` verifica que cada texto respete eso y que la distribución pueda escribirlo: correr `node --test` después de tocar lecciones.
 - Textos en español correcto (con sus tildes): si una palabra necesita una tecla que todavía no se enseñó, se elige otra palabra.
 - Cada intento = ejercicios fijos + uno generado al azar con `words` (o grupos de letras si hay menos de 4 palabras).
@@ -110,6 +110,7 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 - `#/progreso` muestra "Mi progreso" (promedios de las últimas 10 sesiones de lecciones, racha, gráfico, teclas con más errores, medallas en infantil, que van primero), con selector de distribución al lado del título.
 - `#/inicio` muestra una línea con los números (infantil: estrellas, medallas y racha; adulto: PPM, precisión y racha) y los enlaces (Mi progreso, cambiar y editar perfil) junto al saludo, siempre a la vista. El botón principal abre directo la lección recomendada ("Empezar" la primera vez, después "Seguir"); debajo, "Ver todas las lecciones". En el mapa, la recomendada dice "Empezá acá" mientras no haya ninguna aprobada.
 - "Mi progreso" también se enlaza desde el mapa y desde los resultados de cada lección (no durante la práctica).
+- **Sin jerga en la interfaz:** "fila guía" no se usa en ningún texto que vea el usuario (quien empieza no sabe qué es); se dice "fila del medio" o "su lugar". El término queda solo en el código y esta guía.
 - En el perfil, las manos se presentan como "Manos de la pantalla" (el dibujo), no "Tus manos": se leía como dónde apoyar las manos de verdad.
 - Pantallas: `#/` elegir perfil (y respaldo; mostrarla deja sin perfil activo), `#/perfiles/nuevo`, `#/perfiles/:id/editar`, `#/inicio` del perfil activo, `#/lecciones` (mapa), `#/lecciones/:id`, `#/posicion-de-las-manos`, `#/teclado-libre`. Las pantallas que necesitan un perfil activo redirigen a `#/`.
 - El modo (`data-mode` en `<html>`) y la distribución de la práctica salen del perfil activo.

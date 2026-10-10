@@ -79,7 +79,7 @@ function renderUnit(unit, states, recommendedText) {
     'section',
     { class: 'lesson-unit' },
     el('h2', {}, unit.title),
-    // Unit names like "Fila guía" mean nothing to a beginner: one plain line says what they are.
+    // Unit names like "Estiramientos" mean little to a beginner: one plain line says what they are.
     unit.description ? el('p', { class: 'lesson-unit__description muted' }, unit.description) : null,
     el(
       'ol',

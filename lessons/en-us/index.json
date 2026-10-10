@@ -2,8 +2,8 @@
   "layout": "en-us",
   "units": [
     {
-      "title": "Fila guía",
-      "description": "La fila del medio, donde descansan los dedos: a s d f j k l ;. De acá sale todo lo demás.",
+      "title": "Fila del medio",
+      "description": "Donde descansan los dedos: a s d f j k l ;. Cada dedo tiene su tecla y de acá sale todo lo demás.",
       "lessons": [
         "01-f-j",
         "02-d-k",
@@ -21,7 +21,7 @@
     },
     {
       "title": "Fila superior",
-      "description": "La fila de arriba: cada dedo sube y vuelve a la fila guía.",
+      "description": "La fila de arriba: cada dedo sube y vuelve a su lugar.",
       "lessons": [
         "07-e-i",
         "08-r-u",
@@ -32,7 +32,7 @@
     },
     {
       "title": "Fila inferior",
-      "description": "La fila de abajo: cada dedo baja y vuelve a la fila guía.",
+      "description": "La fila de abajo: cada dedo baja y vuelve a su lugar.",
       "lessons": [
         "12-v-m",
         "13-c-coma",
