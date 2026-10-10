@@ -20,7 +20,10 @@ export function render(container) {
     return;
   }
 
-  const continueLine = el('span', { class: 'home-action__description' }, text.lessonsDescription);
+  // The main action opens the lesson to do next (once the course loads; the map until then).
+  const lessonsTitle = el('span', { class: 'home-action__title' }, text.lessons);
+  const lessonsLine = el('span', { class: 'home-action__description' }, text.lessonsDescription);
+  const lessonsAction = el('a', { class: 'home-action', href: '#/lecciones' }, lessonsTitle, lessonsLine);
   // How it is going, in a line (filled when the course loads; empty before the first lesson).
   const stats = el('ul', { class: 'home-stats', 'aria-label': text.progress });
 
@@ -52,12 +55,7 @@ export function render(container) {
     el(
       'div',
       { class: 'home-actions' },
-      el(
-        'a',
-        { class: 'home-action', href: '#/lecciones' },
-        el('span', { class: 'home-action__title' }, text.lessons),
-        continueLine,
-      ),
+      el('div', { class: 'home-action-group' }, lessonsAction, el('a', { href: '#/lecciones' }, text.allLessons)),
       el(
         'a',
         { class: 'home-action home-action--secondary', href: '#/teclado-libre' },
@@ -68,15 +66,23 @@ export function render(container) {
     el('div', { class: 'install-slot' }, createInstallButton()),
   );
 
-  // Where to continue: the recommended lesson of this profile's course (ignored if the
-  // user left this screen before the course loaded).
+  // Where to start or go on: the recommended lesson of this profile's course (ignored if
+  // the user left this screen before the course loaded). The lesson shows the hands intro
+  // first when it was never done.
   let left = false;
   getCourse(profile.layoutId).then(
     (course) => {
       if (left) return;
       const states = lessonStates(course, profiles.progressFor(profile.id, profile.layoutId), profile.mode);
       const next = course.lessons.find((lesson) => states.get(lesson.id).recommended);
-      continueLine.textContent = next ? text.continueWith(next.number, next.title) : text.courseDone;
+      if (next) {
+        const started = [...states.values()].some((state) => state.status === 'completed');
+        lessonsTitle.textContent = started ? text.continue : text.start;
+        lessonsLine.textContent = text.nextLesson(next.number, next.title);
+        lessonsAction.href = `#/lecciones/${encodeURIComponent(next.id)}`;
+      } else {
+        lessonsLine.textContent = text.courseDone;
+      }
       stats.replaceChildren(...statItems(profile, summarizeProgress(profile, profile.layoutId, course)));
     },
     () => {}, // keep the generic description; the lessons screen explains load errors

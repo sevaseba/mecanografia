@@ -278,7 +278,12 @@ function results({ course, lesson, stats, stars, goal, goals, isRecord, kids, me
       kids && medals.length ? medalsEarned(course, medals) : null,
       passed && !next ? el('p', { class: 'results__record' }, text.courseFinished) : null,
       el('div', { class: 'results__actions' }, actions),
-      el('a', { href: '#/lecciones' }, text.backToMap),
+      el(
+        'nav',
+        { class: 'screen-links', 'aria-label': strings.appName },
+        el('a', { href: '#/lecciones' }, text.backToMap),
+        el('a', { href: '#/progreso' }, text.progress),
+      ),
     ),
     starGoalsList(goals, kids),
   );

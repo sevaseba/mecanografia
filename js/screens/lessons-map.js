@@ -25,7 +25,12 @@ export function render(container) {
 
   const status = el('p', { class: 'muted', role: 'status' }, text.loading);
   container.append(
-    el('a', { class: 'back-link', href: '#/inicio' }, `← ${text.back}`),
+    el(
+      'nav',
+      { class: 'screen-links', 'aria-label': strings.appName },
+      el('a', { href: '#/inicio' }, `← ${text.back}`),
+      el('a', { href: '#/progreso' }, text.progress),
+    ),
     el('h1', {}, text.title),
     el(
       'div',
@@ -49,8 +54,12 @@ export function render(container) {
       const states = lessonStates(course, profiles.progressFor(profile.id, profile.layoutId), profile.mode);
       const passed = [...states.values()].filter((state) => state.status === 'completed').length;
       const anyLocked = [...states.values()].some((state) => state.status === 'locked');
-      status.textContent = text.summary(getLayout(profile.layoutId).name, passed, course.lessons.length) + (anyLocked ? ` ${text.lockedHint}` : '');
-      container.append(...course.units.map((unit) => renderUnit(unit, states)));
+      // Kids open lessons in order; adults have them all open, so tell them where the order goes.
+      const hint = anyLocked ? text.lockedHint : profile.mode === 'adult' ? text.anyOrderHint : '';
+      const summary = text.summary(getLayout(profile.layoutId).name, passed, course.lessons.length);
+      status.textContent = hint ? `${summary}. ${hint}` : summary;
+      const recommendedText = passed ? text.recommended : text.recommendedFirst;
+      container.append(...course.units.map((unit) => renderUnit(unit, states, recommendedText)));
       // Open where the profile goes on, if that is further down.
       const current = container.querySelector('.lesson-tile--recommended');
       if (current && current.getBoundingClientRect().bottom > window.innerHeight) current.scrollIntoView({ block: 'center' });
@@ -65,17 +74,23 @@ export function render(container) {
   };
 }
 
-function renderUnit(unit, states) {
+function renderUnit(unit, states, recommendedText) {
   return el(
     'section',
     { class: 'lesson-unit' },
     el('h2', {}, unit.title),
-    el('ol', { class: 'lesson-grid' }, unit.lessons.map((lesson) => el('li', {}, lessonTile(lesson, states.get(lesson.id))))),
+    // Unit names like "Fila guía" mean nothing to a beginner: one plain line says what they are.
+    unit.description ? el('p', { class: 'lesson-unit__description muted' }, unit.description) : null,
+    el(
+      'ol',
+      { class: 'lesson-grid' },
+      unit.lessons.map((lesson) => el('li', {}, lessonTile(lesson, states.get(lesson.id), recommendedText))),
+    ),
   );
 }
 
-function lessonTile(lesson, state) {
-  const statusText = state.recommended ? text.recommended : text.status[state.status];
+function lessonTile(lesson, state, recommendedText) {
+  const statusText = state.recommended ? recommendedText : text.status[state.status];
   const keys = lesson.newKeys;
   const locked = state.status === 'locked';
   const content = [

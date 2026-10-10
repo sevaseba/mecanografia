@@ -53,6 +53,7 @@ export function buildCourse(index, lessons) {
   const ordered = [];
   const units = index.units.map((unit, unitIndex) => ({
     title: unit.title,
+    description: unit.description ?? '',
     lessons: unit.lessons.map((id) => {
       const lesson = byId.get(id);
       lesson.newKeys.forEach((key) => allowed.add(key));

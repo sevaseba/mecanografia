@@ -1,7 +1,10 @@
 /* Lessons: course map tiles, keycaps, stars and the results screen. */
 
-.back-link {
-  display: inline-block;
+/* Links to the screens around this one (back, lessons, progress). */
+.screen-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem var(--space-lg);
   margin-bottom: var(--space-md);
 }
 
@@ -23,6 +26,10 @@
 
 .lesson-unit h2 {
   margin-bottom: var(--space-sm);
+}
+
+.lesson-unit__description {
+  margin: -0.25rem 0 var(--space-sm);
 }
 
 

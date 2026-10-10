@@ -3,6 +3,7 @@
   "units": [
     {
       "title": "Fila guía",
+      "description": "La fila del medio, donde descansan los dedos: a s d f j k l ñ. De acá sale todo lo demás.",
       "lessons": [
         "01-f-j",
         "02-d-k",
@@ -13,12 +14,14 @@
     },
     {
       "title": "Estiramientos",
+      "description": "Los índices se estiran hacia el centro, a la g y la h.",
       "lessons": [
         "06-g-h"
       ]
     },
     {
       "title": "Fila superior",
+      "description": "La fila de arriba: cada dedo sube y vuelve a la fila guía.",
       "lessons": [
         "07-e-i",
         "08-r-u",
@@ -29,6 +32,7 @@
     },
     {
       "title": "Fila inferior",
+      "description": "La fila de abajo: cada dedo baja y vuelve a la fila guía.",
       "lessons": [
         "12-v-m",
         "13-c-coma",
@@ -39,12 +43,14 @@
     },
     {
       "title": "Mayúsculas",
+      "description": "Con la tecla Mayús, usando la mano contraria a la letra.",
       "lessons": [
         "17-mayusculas"
       ]
     },
     {
       "title": "Puntuación",
+      "description": "Los signos para escribir oraciones completas.",
       "lessons": [
         "18-punto-y-coma-dos-puntos",
         "19-pregunta",
@@ -53,6 +59,7 @@
     },
     {
       "title": "Tildes y diéresis",
+      "description": "Primero la tecla de la tilde y después la vocal.",
       "lessons": [
         "21-a-e-acento",
         "22-i-o-u-acento",
@@ -62,6 +69,7 @@
     },
     {
       "title": "Números y símbolos",
+      "description": "La fila de más arriba: números y símbolos.",
       "lessons": [
         "25-numeros-1-5",
         "26-numeros-6-0",

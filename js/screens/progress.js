@@ -37,7 +37,12 @@ export function render(container) {
   const content = el('div', { class: 'progress-content' });
 
   container.append(
-    el('a', { class: 'back-link', href: '#/inicio' }, `← ${text.back}`),
+    el(
+      'nav',
+      { class: 'screen-links', 'aria-label': strings.appName },
+      el('a', { href: '#/inicio' }, `← ${text.back}`),
+      el('a', { href: '#/lecciones' }, strings.lessons.backToMap),
+    ),
     // The layout selector is rarely used: beside the title, not before the numbers.
     el(
       'div',

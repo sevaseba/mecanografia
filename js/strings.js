@@ -175,8 +175,10 @@ export const strings = {
 
   // The hands drawn with the keyboard: their look and where they go.
   hands: {
-    label: 'Tus manos',
-    kidsLabel: 'Elegí tus manos',
+    // "Tus manos" alone read as where to put your real hands: say it is the drawing.
+    label: 'Manos de la pantalla',
+    kidsLabel: 'Elegí las manos de la pantalla',
+    hint: 'Un dibujo de manos te muestra qué dedo usar para cada tecla.',
     change: 'Cambiar las manos',
     done: 'Listo',
     skins: {
@@ -192,7 +194,7 @@ export const strings = {
       robot: 'Robot',
       monster: 'Monstruo',
     },
-    placementLabel: 'Dónde se ven',
+    placementLabel: 'Dónde se dibujan',
     placements: { below: 'Abajo del teclado', over: 'Sobre el teclado' },
   },
 
@@ -208,7 +210,10 @@ export const strings = {
     progress: 'Mi progreso',
     lessons: 'Lecciones',
     lessonsDescription: 'Aprendé paso a paso, de la fila guía a los números.',
-    continueWith: (number, title) => `Seguí con la lección ${number}: ${title}`,
+    start: 'Empezar',
+    continue: 'Seguir',
+    nextLesson: (number, title) => `Lección ${number}: ${title}`,
+    allLessons: 'Ver todas las lecciones',
     courseDone: '¡Completaste todo el curso!',
     freeTyping: 'Teclado libre',
     freeTypingDescription: 'Escribí textos de prueba con la guía del teclado y las manos.',
@@ -239,6 +244,9 @@ export const strings = {
       completed: 'Aprobada',
     },
     recommended: 'Seguí acá',
+    recommendedFirst: 'Empezá acá',
+    anyOrderHint: 'Conviene hacerlas en orden, pero podés elegir cualquiera.',
+    progress: 'Mi progreso',
     lockedHint: 'Aprobá cada lección para abrir la siguiente.',
     stars: (count) => `${count} de 3 estrellas`,
     exerciseCounter: (current, total) => `Ejercicio ${current} de ${total}`,

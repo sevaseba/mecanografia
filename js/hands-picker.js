@@ -58,8 +58,9 @@ export function createHandsPicker({ mode, hands, handsPlacement, onChange = () =
     { class: 'hands-picker' },
     el(
       'div',
-      { class: 'field hands-picker__group', role: 'radiogroup', 'aria-labelledby': skinLabel.id },
+      { class: 'field hands-picker__group', role: 'radiogroup', 'aria-labelledby': skinLabel.id, 'aria-describedby': `hands-skin-hint-${id}` },
       skinLabel,
+      el('span', { class: 'muted', id: `hands-skin-hint-${id}` }, text.hint),
       el('div', { class: 'hands-picker__skins' }, skinTiles),
     ),
     el(
