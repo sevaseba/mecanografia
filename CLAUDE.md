@@ -75,7 +75,8 @@ PWA para aprender mecanografía (dactilografía), pensada para usar en familia.
 │       └── 01-f-j.json, ...
 ├── tests/                # pruebas de la lógica pura: `node --test` desde la raíz
 ├── tools/                # herramientas de desarrollo (no son parte de la app)
-│   └── generate-voice.mjs # graba los clips de voz con ElevenLabs (voz rioplatense)
+│   ├── generate-voice.mjs # graba los clips de voz con ElevenLabs (voz rioplatense)
+│   └── find-voices.mjs   # busca voces rioplatenses en la biblioteca de ElevenLabs para comparar
 ├── icons/                # íconos de la PWA (192, 512, maskable)
 ├── assets/audio/kids/    # clips de voz (mp3) + index.json con la lista
 └── assets/fonts/         # Nunito (modo infantil), con su licencia OFL

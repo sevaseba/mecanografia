@@ -272,7 +272,7 @@ export const strings = {
         adult: () =>
           'Cada dedo tiene un color. Las teclas del mismo color se presionan siempre con ese dedo. ' +
           'Los pulgares se encargan de la barra espaciadora.',
-        kids: () => 'Cada dedo tiene un color. Aprieta las teclas de su mismo color.',
+        kids: () => 'Cada dedo tiene un color. Apretá las teclas de su mismo color.',
       },
       home: {
         title: 'La fila guía',
