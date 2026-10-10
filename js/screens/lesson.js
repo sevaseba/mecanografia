@@ -33,6 +33,7 @@ import { pickOne } from '../random.js';
 import { isIntroDone } from '../hands-intro.js';
 import { createHandsIntroView } from '../hands-intro-view.js';
 import { saveIntroDone, voiceOptions } from './hands-intro.js';
+import { createVoice } from '../voice.js';
 
 const text = strings.lessons;
 const keyIndexes = layouts.map(createKeyIndex);
@@ -49,6 +50,7 @@ export function render(container, params) {
 
   let view = null;
   let intro = null;
+  const voice = createVoice();
   let pauseTimer = null;
   let left = false;
 
@@ -107,6 +109,7 @@ export function render(container, params) {
 
     view?.destroy();
     clearTimeout(pauseTimer);
+    voice.stop();
     view = createPracticeView({
       title: text.lessonTitle(lesson.number, lesson.title),
       keyIndex: keyIndexes.find((index) => index.layout.id === profile.layoutId),
@@ -156,11 +159,14 @@ export function render(container, params) {
     const goal = nextStar(result, targets);
     const goals = starGoals(result, targets);
     const isRecord = before && stats.accuracy > before.bestAccuracy;
-    const screen = results({ course, lesson, stats, stars, goal, goals, isRecord, kids, medals, retry: () => start(course, lesson) });
+    const sentence = text.resultVoice[stars === 0 ? 'failed' : (goal?.missing ?? 'perfect')];
+    const say = () => voice.say([sentence]);
+    const screen = results({ course, lesson, stats, stars, goal, goals, isRecord, kids, medals, sentence, say, retry: () => start(course, lesson) });
     container.replaceChildren(screen);
     container.querySelector('.results .button')?.focus();
     announce(screen.querySelector('h1').textContent);
     if (kids && stars > 0) launchConfetti();
+    if (kids && profiles.get(profile.id).settings.voice) say();
   }
 
   return () => {
@@ -168,6 +174,7 @@ export function render(container, params) {
     clearTimeout(pauseTimer);
     intro?.destroy();
     view?.destroy();
+    voice.stop();
   };
 }
 
@@ -205,7 +212,7 @@ function medalsEarned(course, medals) {
   );
 }
 
-function results({ course, lesson, stats, stars, goal, goals, isRecord, kids, medals, retry }) {
+function results({ course, lesson, stats, stars, goal, goals, isRecord, kids, medals, sentence, say, retry }) {
   const passed = stars > 0;
   // Kids: varied, always positive words. Adults: plain facts.
   const heading = kids ? pickOne(passed ? strings.encouragement.passed : strings.encouragement.retry) : passed ? text.passedTitle : text.failedTitle;
@@ -252,6 +259,19 @@ function results({ course, lesson, stats, stars, goal, goals, isRecord, kids, me
     ),
     isRecord ? el('p', { class: 'results__record' }, text.newRecord) : null,
     message ? el('p', {}, message) : null,
+    kids
+      ? el(
+          'p',
+          { class: 'results__voice' },
+          el('span', {}, sentence),
+          el(
+            'button',
+            { type: 'button', class: 'button button--secondary button--small', onClick: say },
+            el('span', { 'aria-hidden': 'true' }, '🔊 '),
+            strings.handsIntro.listen,
+          ),
+        )
+      : null,
     starGoalsList(goals, kids),
     kids && medals.length ? medalsEarned(course, medals) : null,
     passed && !next ? el('p', { class: 'results__record' }, text.courseFinished) : null,

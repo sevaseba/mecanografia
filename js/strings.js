@@ -223,6 +223,15 @@ export const strings = {
     passedTitle: '¡Lección aprobada!',
     failedTitle: 'Todavía no aprobaste',
     perfect: '¡Perfecta! Conseguiste las tres estrellas.',
+    // Kids: what the voice says (and the screen shows) about the next star. Recorded clips:
+    // after changing one, run tools/generate-voice.mjs.
+    resultVoice: {
+      perfect: '¡Ganaste las tres estrellas! ¡Lo hiciste genial!',
+      accuracy: 'Para la próxima estrella, apretá cada tecla con cuidado.',
+      speed: 'Para la próxima estrella, escribí un poquito más rápido.',
+      both: 'Para la próxima estrella, apretá con cuidado y un poquito más rápido.',
+      failed: '¡Casi! Probá de nuevo, mirando bien cada tecla.',
+    },
     starGoals: {
       title: '¿Cómo se ganan las estrellas?',
       needs: {

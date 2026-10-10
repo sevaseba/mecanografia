@@ -1,6 +1,6 @@
 // Records the kids voice clips with ElevenLabs text to speech, using a rioplatense voice.
 // Development tool, not part of the app: run it from the project root after changing any
-// kids text of the hands intro, then bump CACHE_VERSION in sw.js.
+// kids text of the hands intro or of strings.lessons.resultVoice, then bump CACHE_VERSION in sw.js.
 //
 //   node tools/generate-voice.mjs --list   sentences and clips, nothing is recorded
 //   node tools/generate-voice.mjs          records the missing clips
@@ -15,6 +15,7 @@ import { layouts } from '../js/layouts/index.js';
 import { createKeyIndex } from '../js/keystrokes.js';
 import { buildIntroSteps } from '../js/hands-intro.js';
 import { spokenSentences } from '../js/hands-intro-copy.js';
+import { strings } from '../js/strings.js';
 import { VOICE_DIR, VOICE_INDEX, clipName, spokenText } from '../js/voice-clips.js';
 
 const MODEL = process.env.ELEVENLABS_MODEL ?? 'eleven_multilingual_v2';
@@ -31,6 +32,7 @@ for (const layout of layouts) {
   const keyIndex = createKeyIndex(layout);
   for (const sentence of spokenSentences(keyIndex, buildIntroSteps(keyIndex))) sentences.set(clipName(sentence), sentence);
 }
+for (const sentence of Object.values(strings.lessons.resultVoice)) sentences.set(clipName(sentence), sentence);
 
 if (args.has('--list')) {
   for (const [name, sentence] of sentences) {

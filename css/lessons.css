@@ -191,6 +191,16 @@ main:has(> .results) {
   font-weight: 700;
 }
 
+/* Kids: what the voice says about the next star, with its "Escuchar" button. */
+.results__voice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-weight: 700;
+}
+
 /* "¿Cómo se ganan las estrellas?" */
 .star-goals {
   width: 100%;
