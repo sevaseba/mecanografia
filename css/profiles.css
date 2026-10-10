@@ -84,8 +84,12 @@
   border: 0;
   background: none;
   color: var(--color-link);
-  text-decoration: underline;
+  text-decoration: none;
   cursor: pointer;
+}
+
+.link-button:hover {
+  text-decoration: underline;
 }
 
 .backup {

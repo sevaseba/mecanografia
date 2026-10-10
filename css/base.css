@@ -52,8 +52,18 @@ p {
   max-width: 65ch;
 }
 
+/* Links stand alone in this app (no links inside paragraphs): no underline, except on hover. */
 a {
   color: var(--color-link);
+}
+
+/* Zero specificity, so links styled as buttons or tiles keep their own look. */
+:where(a) {
+  text-decoration: none;
+}
+
+:where(a:hover) {
+  text-decoration: underline;
 }
 
 /* The hidden attribute always wins, even over components that set their own display. */
