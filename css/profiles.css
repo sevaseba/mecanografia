@@ -417,11 +417,8 @@ input[aria-invalid="true"] {
   gap: var(--space-md);
 }
 
-/* The main action with the link to the whole map under it. */
-.home-action-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
+.home-all-lessons {
+  margin: var(--space-sm) 0 0;
 }
 
 .home-action {

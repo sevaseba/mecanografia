@@ -55,7 +55,7 @@ export function render(container) {
     el(
       'div',
       { class: 'home-actions' },
-      el('div', { class: 'home-action-group' }, lessonsAction, el('a', { href: '#/lecciones' }, text.allLessons)),
+      lessonsAction,
       el(
         'a',
         { class: 'home-action home-action--secondary', href: '#/teclado-libre' },
@@ -63,6 +63,8 @@ export function render(container) {
         el('span', { class: 'home-action__description' }, text.freeTypingDescription),
       ),
     ),
+    // Under the cards, not inside the lessons one's cell: both cards keep the same height.
+    el('p', { class: 'home-all-lessons' }, el('a', { href: '#/lecciones' }, text.allLessons)),
     el('div', { class: 'install-slot' }, createInstallButton()),
   );
 
